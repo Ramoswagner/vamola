@@ -4,8 +4,8 @@
 
 // Paleta de cores rotativa para identificar projetos visualmente
 const PROJ_COLORS = [
-  '#2563EB', '#7C3AED', '#DB2777', '#D97706',
-  '#059669', '#DC2626', '#0284C7', '#9333EA'
+  '2563EB', '7C3AED', 'DB2777', 'D97706',
+  '059669', 'DC2626', '0284C7', '9333EA'
 ];
 
 // Estado principal — fonte única da verdade da aplicação
