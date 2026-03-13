@@ -4,5 +4,9 @@ const modelos = {
     minimalista: new ModeloMinimalista(),
     cybergrid:   new ModeloCyberGrid(),   
     brutal:      new ModeloBrutal(),      
-    aurora:      new ModeloAurora(),      
+    aurora:      new ModeloAurora(),
+    noir:        new ModeloNoir(),
+    bauhaus:     new ModeloBauhaus(),
+    revista:     new ModeloRevista(),
+    eclipse:     new ModeloEclipse(),
 };
