@@ -5,6 +5,7 @@
 // ════════════════════════════════════════════════════
 const G = {
   mode: 'single',
+  modelo: 'classico',
   step: 'identity',
   theme: 'oceano',
   id: { instName:'', instDept:'', presTitle:'', presDate:'', presSub:'',
@@ -185,6 +186,7 @@ function init() {
   renderThemeGrid();
   renderPreviewBlocks();
   refreshPreview();
+  selectModelo('classico');
 }
 
 // ════════════════════════════════════════════════════
@@ -194,6 +196,15 @@ function selectMode(mode) {
   G.mode = mode;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('modeBtn-'+mode)?.classList.add('selected');
+}
+
+function selectModelo(modelo) {
+    G.modelo = modelo;
+    // Atualiza botões na splash
+    document.querySelectorAll('.modelo-btn').forEach(btn => btn.classList.remove('selected'));
+    const btn = document.getElementById('modeloBtn-' + modelo);
+    if (btn) btn.classList.add('selected');
+    toast(`Modelo "${modelo}" selecionado`, 'info');
 }
 
 function startBuilder() {
