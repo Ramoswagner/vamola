@@ -105,6 +105,7 @@ function renderThemeGrid() {
 function selectTheme(id) {
   G.theme = id;
   renderThemeGrid();
+  renderModeloGrid();   // thumbnails usam as cores do tema
   refreshPreview();
   toast(`Tema "${THEMES[id].name}" selecionado`, 'ok');
 }
@@ -638,6 +639,247 @@ function toast(msg,type='info'){
   const t=document.createElement('div');
   t.className=`toast ${type}`; t.textContent=msg;
   w.appendChild(t); setTimeout(()=>t.remove(),4000);
+}
+
+// ════════════════════════════════════════════════════
+// MODELOS — metadata + thumbnails SVG + grid
+// ════════════════════════════════════════════════════
+
+const MODELOS_META = {
+  classico:    { name:'Clássico',      desc:'Dois painéis, hierarquia clara e atemporal',   tags:['corporativo','formal','elegante'] },
+  moderno:     { name:'Moderno',       desc:'Bloco de cor agressivo, geometria em diagonal', tags:['contemporâneo','bold','impacto'] },
+  minimalista: { name:'Minimalista',   desc:'Linha única, espaço negativo generoso',         tags:['clean','elegante','respirado'] },
+  cybergrid:   { name:'CyberGrid',     desc:'Grade, glow neon e tipografia terminal',        tags:['tech','digital','HUD'] },
+  brutal:      { name:'Brutal',        desc:'Blocos brutos, editorial agressivo, fanzine',   tags:['editorial','manifesto','raw'] },
+  aurora:      { name:'Aurora',        desc:'Orbes de luz difusa, névoa de cor atmosférica', tags:['conceitual','premium','orgânico'] },
+  noir:        { name:'Noir',          desc:'Faixa de cor queimada, contraste extremo',      tags:['cinematográfico','poster','drama'] },
+  bauhaus:     { name:'Bauhaus',       desc:'Círculo dominante — geometria como linguagem',  tags:['geométrico','design','ícone'] },
+  revista:     { name:'Revista',       desc:'Espinha vertical, duas colunas editoriais',     tags:['editorial','magazine','coluna'] },
+  eclipse:     { name:'Eclipse',       desc:'Halos concêntricos, foco no núcleo do portal',  tags:['orbital','dramático','foco'] },
+  lumina:      { name:'Lumina Prism',  desc:'Glassmorphism, vidro holográfico e refração',   tags:['glassy','futurista','premium'] },
+};
+
+// ── SVG helpers privados ──────────────────────────
+function _R(x,y,w,h,fill,extra=''){
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${extra}/>`;
+}
+function _E(cx,cy,rx,ry,fill,op=1){
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" opacity="${op}"/>`;
+}
+function _C(cx,cy,r,fill,op=1){
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" opacity="${op}"/>`;
+}
+// Linha de texto simulada (retângulo arredondado)
+function _T(x,y,w,h,fill,op=0.5){
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" opacity="${op}" rx="1.5"/>`;
+}
+// Bloco de texto simulado — N linhas empilhadas
+function _TB(x,y,lineW,fill,n=3,lh=5,gap=9,op=0.5){
+  return Array.from({length:n},(_,i)=>_T(x,y+i*gap, i===n-1?lineW*0.62:lineW, lh, fill, op-(i*0.06))).join('');
+}
+// SVG container
+function _SVG(content){
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="100%" preserveAspectRatio="xMidYMid meet">${content}</svg>`;
+}
+
+// ── 11 thumbnails — um por modelo ────────────────
+function svgModelThumb(id, C) {
+  const bg=`#${C.bg}`, bg2=`#${C.bg2}`, txt=`#${C.txt}`, muted=`#${C.muted}`;
+  const a1=`#${C.a1}`, a2=`#${C.a2}`, a3=`#${C.a3||C.a2}`;
+  const teal=`#${C.teal||C.a2}`;
+
+  switch(id) {
+
+    // ── Clássico: split vertical 56 / 44 + linha de acento ──
+    case 'classico': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_R(179,0,141,180,bg2)}
+      ${_R(0,176,180,4,a1)}
+      ${_R(0,176,70,4,a2)}
+      ${_T(18,42,52,3,a1,0.6)}
+      ${_TB(18,52,148,txt,4,6,12,0.75)}
+      ${[0,1,2].map(i=>_R(202,54+i*26,44,4,a1,`opacity="${0.3+i*0.15}"`)).join('')}
+      ${_R(202,54,8,4,a1,'opacity="0.8"')}
+      ${_R(202,80,8,4,a2,'opacity="0.8"')}
+      ${_R(202,106,8,4,teal,'opacity="0.8"')}
+    `);
+
+    // ── Moderno: bloco superior a1 + divisor diagonal ──
+    case 'moderno': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_R(0,0,320,94,a1)}
+      ${_R(0,86,320,15,bg2)}
+      ${_R(0,94,320,86,bg)}
+      ${_R(0,0,320,3,a2)}
+      ${_T(18,14,200,18,bg,0.9)}
+      ${_T(18,40,130,10,bg,0.65)}
+      ${_T(18,57,90,6,bg,0.4)}
+      ${_TB(18,110,130,txt,2,5,11,0.65)}
+      ${[0,1,2].map(i=>_R(282,12+i*22,6,26,bg,`opacity="0.35"`)).join('')}
+    `);
+
+    // ── Minimalista: linha única + tipografia leve ──
+    case 'minimalista': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_R(20,76,280,1,a1)}
+      ${_T(20,60,80,4,muted,0.55)}
+      ${_T(20,83,220,18,txt,0.88)}
+      ${_T(20,107,160,11,txt,0.65)}
+      ${_T(20,124,120,7,muted,0.38)}
+      ${_T(20,138,80,5,muted,0.25)}
+    `);
+
+    // ── CyberGrid: grade + caixa neon + brackets HUD ──
+    case 'cybergrid': {
+      const gridH = Array.from({length:31},(_,i)=>
+        `<line x1="0" y1="${i*6}" x2="320" y2="${i*6}" stroke="${a1}" stroke-width="0.5" opacity="0.1"/>`).join('');
+      const gridV = Array.from({length:31},(_,i)=>
+        `<line x1="${i*10.67}" y1="0" x2="${i*10.67}" y2="180" stroke="${a1}" stroke-width="0.5" opacity="0.1"/>`).join('');
+      const corners = [
+        [18,22,1,1],[285,22,-1,1],[18,148,1,-1],[285,148,-1,-1]
+      ].map(([x,y,fx,fy])=>
+        `<line x1="${x}" y1="${y}" x2="${x+fx*14}" y2="${y}" stroke="${a1}" stroke-width="1.5" opacity="0.65"/>
+         <line x1="${x}" y1="${y}" x2="${x}" y2="${y+fy*14}" stroke="${a1}" stroke-width="1.5" opacity="0.65"/>`
+      ).join('');
+      return _SVG(`
+        ${_R(0,0,320,180,bg)}
+        ${gridH}${gridV}
+        ${_R(18,22,285,130,bg2,'opacity="0.65"')}
+        ${_R(18,22,285,2,a1,'opacity="0.7"')}
+        ${_R(18,22,2,130,a1,'opacity="0.7"')}
+        ${_T(30,32,70,4,a2,0.75)}
+        ${_T(30,44,220,14,a1,0.9)}
+        ${_T(30,65,170,8,a1,0.55)}
+        ${_T(30,80,110,5,muted,0.45)}
+        ${corners}
+      `);
+    }
+
+    // ── Brutal: bloco sólido + strip + acento ──
+    case 'brutal': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_R(0,0,200,180,a1)}
+      ${_R(174,0,44,180,bg2)}
+      ${_R(220,104,100,76,a2)}
+      ${_T(14,22,160,18,bg,0.9)}
+      ${_T(14,48,120,11,bg,0.68)}
+      ${_T(14,67,80,6,bg,0.42)}
+      ${_T(14,155,60,4,bg,0.3)}
+    `);
+
+    // ── Aurora: orbes difusos + névoa + linha de luz ──
+    case 'aurora': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_E(48,63,90,99,a1,0.13)}
+      ${_E(230,108,70,79,a2,0.13)}
+      ${_E(144,18,58,58,teal,0.10)}
+      ${_R(0,0,208,180,bg,'opacity="0.38"')}
+      ${_R(0,0,208,180,a1,'opacity="0.05"')}
+      ${_R(0,86,208,1,a2,'opacity="0.55"')}
+      ${_T(16,36,180,20,txt,0.82)}
+      ${_T(16,62,130,10,txt,0.55)}
+      ${_T(16,78,95,6,muted,0.4)}
+    `);
+
+    // ── Noir: preto + faixa de cor + texto branco ──
+    case 'noir': return _SVG(`
+      ${_R(0,0,320,180,'#000000')}
+      ${_R(0,68,320,6,a1)}
+      ${_R(0,62,320,3,a1,'opacity="0.22"')}
+      ${_T(14,12,220,20,'#ffffff',0.88)}
+      ${_T(14,38,180,13,'#ffffff',0.68)}
+      ${_T(14,80,160,9,'#ffffff',0.42)}
+      ${_T(14,95,110,7,'#ffffff',0.3)}
+    `);
+
+    // ── Bauhaus: círculo dominante + acento + texto ──
+    case 'bauhaus': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_C(198,81,115,a1)}
+      ${_C(0,0,43,a2,0.28)}
+      ${_C(206,88,94,bg,'0.12')}
+      ${_T(14,18,140,20,txt,0.88)}
+      ${_T(14,46,105,11,txt,0.65)}
+      ${_R(14,66,50,2,a1,'opacity="0.7"')}
+      ${_T(14,74,82,6,muted,0.38)}
+    `);
+
+    // ── Revista: espinha + 2 colunas editoriais ──
+    case 'revista': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_R(0,0,9,180,a1)}
+      ${_R(9,0,1,180,a1,'opacity="0.25"')}
+      ${_T(17,16,110,20,txt,0.88)}
+      ${_T(17,43,110,13,txt,0.65)}
+      ${_T(17,62,110,8,txt,0.5)}
+      ${_T(17,76,85,6,muted,0.33)}
+      ${_R(138,8,1,164,a1,'opacity="0.2"')}
+      ${[0,1,2].map(i=>`
+        ${_C(157,54+i*30,6,a2,0.75)}
+        ${_T(170,50+i*30,120,6,txt,0.55)}
+        ${_R(148,63+i*30,140,1,a1,'opacity="0.18"')}
+      `).join('')}
+    `);
+
+    // ── Eclipse: halos concêntricos + conteúdo à esquerda ──
+    case 'eclipse': {
+      const halos = [
+        [88,63,a1,0.07],[75,54,a2,0.10],[62,44,a1,0.13],
+        [50,36,a2,0.16],[35,25,a1,0.20],[20,14,a1,0.26]
+      ].map(([rx,ry,fill,op])=>_E(190,83,rx,ry,fill,op)).join('');
+      return _SVG(`
+        ${_R(0,0,320,180,bg)}
+        ${halos}
+        ${_R(0,0,104,180,bg,'opacity="0.52"')}
+        ${_T(12,20,82,18,txt,0.82)}
+        ${_T(12,44,70,10,txt,0.55)}
+        ${_T(12,60,60,7,muted,0.35)}
+      `);
+    }
+
+    // ── Lumina Prism: glassmorphism + orbes + card ──
+    case 'lumina': return _SVG(`
+      ${_R(0,0,320,180,bg)}
+      ${_E(-32,-18,96,96,a1,0.13)}
+      ${_E(352,198,96,96,a2,0.13)}
+      ${_R(16,22,288,140,bg2,'fill-opacity="0.55" rx="6"')}
+      ${_R(16,22,288,140,'none',`stroke="${a3}" stroke-opacity="0.28" stroke-width="1" rx="6"`)}
+      ${_R(16,22,6,140,a1,'opacity="0.65" rx="3"')}
+      ${_R(16,22,288,2,'#ffffff','opacity="0.15" rx="6"')}
+      ${_T(30,36,200,16,txt,0.88)}
+      ${_R(30,58,50,1,a1,'opacity="0.55"')}
+      ${_T(30,65,160,8,txt,0.55)}
+      ${_T(30,79,120,6,muted,0.38)}
+      ${_T(30,91,90,5,muted,0.28)}
+    `);
+
+    default: return _SVG(`${_R(0,0,320,180,bg)}${_T(120,80,80,10,a1,0.5)}`);
+  }
+}
+
+// ── Render do grid de modelos ─────────────────────
+function renderModeloGrid() {
+  const el = document.getElementById('modeloGrid');
+  if (!el) return;
+  const T = THEMES[G.theme] || THEMES['oceano'];
+  const C = T.C;
+
+  el.innerHTML = Object.entries(MODELOS_META).map(([id, m]) => `
+    <div class="modelo-card ${G.modelo === id ? 'selected' : ''}"
+         id="mc-${id}" onclick="selectModelo('${id}')">
+      <div class="modelo-thumb">${svgModelThumb(id, C)}</div>
+      <div class="modelo-info">
+        <div class="modelo-name">
+          ${m.name}
+          <span class="modelo-sel-badge">✓ selecionado</span>
+        </div>
+        <div class="modelo-desc">${m.desc}</div>
+        <div class="modelo-tags">
+          ${m.tags.map(t => `<span class="modelo-tag">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
 // ════════════════════════════════════════════════════
