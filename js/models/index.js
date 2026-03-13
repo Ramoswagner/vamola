@@ -1,26 +1,10 @@
 // js/models/index.js
-// MANUAL - você escreve uma única vez
-
-export const MODELOS = {
-    classico: () => import('./classico.js'),
-    moderno: () => import('./moderno.js'),
-    minimalista: () => import('./minimalista.js'),
-    // Quando criar novo modelo, adicione aqui manualmente
-    // startup: () => import('./startup.js'),
+// Cria instâncias dos modelos para uso global
+const modelos = {
+    classico: new ModeloClassico(),
+    moderno: new ModeloModerno(),
+    minimalista: new ModeloMinimalista()
 };
 
-export async function carregarModelo(nome) {
-    try {
-        if (!MODELOS[nome]) {
-            throw new Error(`Modelo "${nome}" não encontrado`);
-        }
-        const modulo = await MODELOS[nome]();
-        const ModeloClass = Object.values(modulo)[0];
-        return new ModeloClass();
-    } catch (error) {
-        console.error(`❌ Erro ao carregar modelo ${nome}:`, error);
-        throw error;
-    }
-}
-
-export const MODELOS_DISPONIVEIS = ['classico', 'moderno', 'minimalista'];
+// Se precisar que o objeto seja acessível em outros arquivos, ele está no escopo global (window)
+// O main.js pode acessar diretamente a variável 'modelos'
