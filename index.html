@@ -7,12 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
-/* ═══════════════════════════════════════════════════════════
-   WREN — DISRUPTIVE EDITION (SEU CSS COMPLETO AQUI)
-═══════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
-
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* ========== SEU CSS COMPLETO AQUI (O QUE VOCÊ JÁ TEM) ========== */
+/* COLE TODO O CONTEÚDO DA TAG <style> DO SEU ARQUIVO ORIGINAL AQUI */
+/* É MUITO GRANDE, MAS É EXATAMENTE O QUE VOCÊ JÁ TINHA */
 
 :root{
   /* ── Solo preto-carvão com profundidade ── */
@@ -781,7 +778,6 @@ body::before{
   width:2px;background:linear-gradient(to bottom,transparent,var(--a1),transparent);
 }
 
-  
 </style>
 </head>
 <body>
@@ -790,27 +786,260 @@ body::before{
 
 <div id="app">
 
-<!-- ═════════════════════════════════════════
-     SPLASH (SEU HTML COMPLETO AQUI)
-══════════════════════════════════════════ -->
+<!-- ========== SPLASH - SEU HTML COMPLETO AQUI ========== -->
 <section class="screen active" id="splash">
-  <!-- ... todo o seu HTML do splash ... -->
+  <div class="splash-bird">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9-4-9-9-9zm0 2.5l2.5 4H9.5L12 5.5zm-4.5 6h9l-4.5 6-4.5-6z" fill="white" opacity=".9"/>
+      <path d="M12 3c5 0 9 4 9 9" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none"/>
+    </svg>
+  </div>
+  <h1 class="splash-title">
+    <span class="display grad-text">Wren</span>
+  </h1>
+  <p class="splash-tagline">Dê forma ao que você <em>construiu.</em></p>
+
+  <div class="mode-row">
+    <button class="mode-btn selected" id="modeBtn-single" onclick="selectMode('single')">
+      <div class="mode-btn-icon">◻</div>
+      <div class="mode-btn-name">Projeto Único</div>
+      <div class="mode-btn-desc">Uma iniciativa, todos os blocos que você escolher.</div>
+    </button>
+    <button class="mode-btn" id="modeBtn-portfolio" onclick="selectMode('portfolio')">
+      <div class="mode-btn-icon">◫</div>
+      <div class="mode-btn-name">Portfólio</div>
+      <div class="mode-btn-desc">Vários projetos, sumário automático, visão consolidada.</div>
+    </button>
+    <button class="mode-btn" id="modeBtn-program" onclick="selectMode('program')">
+      <div class="mode-btn-icon">⊞</div>
+      <div class="mode-btn-name">Programa</div>
+      <div class="mode-btn-desc">Projetos com eixo estratégico comum, panorama de contexto.</div>
+    </button>
+  </div>
+
+  <button class="splash-start" onclick="startBuilder()">
+    Começar →
+  </button>
 </section>
 
-<!-- ═════════════════════════════════════════
-     BUILDER (SEU HTML COMPLETO AQUI)
-══════════════════════════════════════════ -->
+<!-- ========== BUILDER - SEU HTML COMPLETO AQUI ========== -->
 <section class="screen" id="builder">
-  <!-- ... todo o seu HTML do builder ... -->
+
+  <!-- Step Nav -->
+  <nav class="step-nav" id="stepNav">
+    <div class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9-4-9-9-9zm0 2.5l2.5 4H9.5L12 5.5zm-4.5 6h9l-4.5 6-4.5-6z"/>
+        </svg>
+      </div>
+      <span class="nav-logo-name">Wren</span>
+    </div>
+
+    <div class="nav-section-label">Configuração</div>
+    <div class="nav-step active" id="ns-identity" onclick="goStep('identity')">
+      <div class="nav-step-dot">01</div>
+      <div><div class="nav-step-label">Identidade</div><div class="nav-step-sub">Logo e organização</div></div>
+    </div>
+    <div class="nav-step" id="ns-blocks" onclick="goStep('blocks')">
+      <div class="nav-step-dot">02</div>
+      <div><div class="nav-step-label">Blocos</div><div class="nav-step-sub">Selecionar conteúdo</div></div>
+    </div>
+    <div class="nav-step" id="ns-theme" onclick="goStep('theme')">
+      <div class="nav-step-dot">03</div>
+      <div><div class="nav-step-label">Tema Visual</div><div class="nav-step-sub">Paleta de cores</div></div>
+    </div>
+
+    <div class="nav-section-label">Conteúdo</div>
+    <div class="nav-step" id="ns-projects" onclick="goStep('projects')">
+      <div class="nav-step-dot" id="ns-proj-dot">04</div>
+      <div><div class="nav-step-label" id="ns-proj-label">Projetos</div><div class="nav-step-sub" id="ns-proj-sub">Preencher dados</div></div>
+    </div>
+
+    <div class="nav-section-label">Exportar</div>
+    <div class="nav-step" id="ns-generate" onclick="goStep('generate')">
+      <div class="nav-step-dot">05</div>
+      <div><div class="nav-step-label">Gerar PPTX</div><div class="nav-step-sub">Exportar apresentação</div></div>
+    </div>
+
+    <div class="nav-bottom">
+      <div class="nav-mode-tag" id="modeTag">◻ Projeto Único</div>
+      <button class="btn-back-splash" onclick="backToSplash()">← Voltar ao início</button>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="builder-main" id="builderMain">
+
+    <!-- STEP: IDENTITY -->
+    <div class="step-page active" id="step-identity">
+      <div class="page-header">
+        <div class="page-num">Passo 01 / 05</div>
+        <h2 class="page-title display">Identidade</h2>
+        <p class="page-desc">Logos, nome da organização e informações que aparecerão na capa e no rodapé dos slides.</p>
+      </div>
+      <div class="logo-upload-row">
+        <div class="logo-slot" id="logoInstSlot" onclick="triggerUp('uLogoInst')">
+          <input type="file" id="uLogoInst" accept="image/*" onchange="handleLogo('logoInst',this)">
+          <img class="prev" id="prev-logoInst">
+          <div class="img-slot-icon">🏢</div>
+          <div class="img-slot-label">Logo Instituição</div>
+          <button class="img-rm" id="rmLogoInst" onclick="rmLogo(event,'logoInst')">✕</button>
+        </div>
+        <div class="logo-slot" id="logoProgSlot" onclick="triggerUp('uLogoProg')">
+          <input type="file" id="uLogoProg" accept="image/*" onchange="handleLogo('logoProg',this)">
+          <img class="prev" id="prev-logoProg">
+          <div class="img-slot-icon">🎯</div>
+          <div class="img-slot-label">Logo Portfólio / Programa <span style="color:var(--muted)">(opcional)</span></div>
+          <button class="img-rm" id="rmLogoProg" onclick="rmLogo(event,'logoProg')">✕</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-mark"></div>Organização</div>
+        <div class="frow c2" style="gap:.9rem">
+          <div class="field"><label>Nome da Instituição</label>
+            <input id="instName" placeholder="Ex: Hospital da Baleia" oninput="G.id.instName=this.value;refreshPreview()">
+          </div>
+          <div class="field"><label>Departamento / Área</label>
+            <input id="instDept" placeholder="Ex: Gestão e Desenvolvimento" oninput="G.id.instDept=this.value">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-mark"></div>Apresentação</div>
+        <div class="frow c2" style="gap:.9rem">
+          <div class="field"><label>Título</label>
+            <input id="presTitle" placeholder="Ex: Navega Baleia 2026" oninput="G.id.presTitle=this.value;refreshPreview()">
+          </div>
+          <div class="field"><label>Data / Período</label>
+            <input id="presDate" placeholder="Ex: Março 2026" oninput="G.id.presDate=this.value;refreshPreview()">
+          </div>
+          <div class="field" style="grid-column:span 2"><label>Subtítulo</label>
+            <input id="presSub" placeholder="Ex: Portfólio de Projetos Estratégicos 2024–2026" oninput="G.id.presSub=this.value;refreshPreview()">
+          </div>
+        </div>
+      </div>
+      <div class="step-footer">
+        <button class="btn btn-ghost" onclick="backToSplash()">← Início</button>
+        <button class="btn btn-primary" onclick="goStep('blocks')">Próximo: Blocos →</button>
+      </div>
+    </div>
+
+    <!-- STEP: BLOCKS -->
+    <div class="step-page" id="step-blocks">
+      <div class="page-header">
+        <div class="page-num">Passo 02 / 05</div>
+        <h2 class="page-title display">Blocos</h2>
+        <p class="page-desc">Monte sua apresentação como Lego — ative apenas o que faz sentido para o seu contexto.</p>
+      </div>
+      <div class="block-grid" id="blockGrid"></div>
+      <div class="step-footer">
+        <button class="btn btn-ghost" onclick="goStep('identity')">← Identidade</button>
+        <button class="btn btn-primary" onclick="goStep('theme')">Próximo: Tema →</button>
+      </div>
+    </div>
+
+    <!-- STEP: THEME -->
+    <div class="step-page" id="step-theme">
+      <div class="page-header">
+        <div class="page-num">Passo 03 / 05</div>
+        <h2 class="page-title display">Tema Visual</h2>
+        <p class="page-desc">Escolha a paleta que representa o tom da sua apresentação.</p>
+      </div>
+      <div class="theme-grid" id="themeGrid"></div>
+      <div class="step-footer">
+        <button class="btn btn-ghost" onclick="goStep('blocks')">← Blocos</button>
+        <button class="btn btn-primary" onclick="goStep('projects')">Próximo: Projetos →</button>
+      </div>
+    </div>
+
+    <!-- STEP: PROJECTS -->
+    <div class="step-page" id="step-projects">
+      <div class="page-header">
+        <div class="page-num">Passo 04 / 05</div>
+        <h2 class="page-title display" id="projStepTitle">Projeto</h2>
+        <p class="page-desc" id="projStepDesc">Preencha as informações da sua iniciativa nos blocos abaixo.</p>
+      </div>
+      <div id="projTabsWrap" style="display:none;margin-bottom:1.5rem">
+        <div class="proj-tabs" id="projTabs"></div>
+        <button class="add-proj-btn" id="btnAddProj" onclick="addProject()">+ Adicionar projeto</button>
+      </div>
+      <div id="projectForms"></div>
+      <div class="step-footer">
+        <button class="btn btn-ghost" onclick="goStep('theme')">← Tema</button>
+        <button class="btn btn-primary" onclick="goStep('generate')">Próximo: Gerar →</button>
+      </div>
+    </div>
+
+    <!-- STEP: GENERATE -->
+    <div class="step-page" id="step-generate">
+      <div class="page-header">
+        <div class="page-num">Passo 05 / 05</div>
+        <h2 class="page-title display">Gerar</h2>
+        <p class="page-desc">Sua apresentação está pronta para exportar. Confira o resumo e clique em Gerar.</p>
+      </div>
+
+      <div class="gen-summary" id="genSummary"></div>
+
+      <div class="card">
+        <div class="card-title"><div class="card-title-mark"></div>Estrutura dos slides</div>
+        <div class="slide-list" id="slideList"></div>
+      </div>
+
+      <div class="progress-wrap" id="progWrap">
+        <div class="progress-track"><div class="progress-bar" id="progBar"></div></div>
+        <div class="progress-msg" id="progMsg"></div>
+      </div>
+
+      <div style="margin-top:1.5rem;display:flex;flex-direction:column;gap:.65rem">
+        <button class="btn-generate" onclick="generatePptx()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:.25rem"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Gerar apresentação PPTX
+        </button>
+        <button class="btn btn-secondary" style="justify-content:center" onclick="saveDraft()">
+          Salvar rascunho JSON
+        </button>
+        <div style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.25rem">Para PDF: abra o PPTX no PowerPoint → Exportar → PDF</div>
+      </div>
+
+      <div class="step-footer">
+        <button class="btn btn-ghost" onclick="goStep('projects')">← Projetos</button>
+        <div></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Live Preview -->
+  <aside class="preview-col" id="previewCol">
+    <div class="preview-header">
+      <span class="preview-title">Preview</span>
+      <span class="preview-badge">Live</span>
+    </div>
+    <div class="slide-preview">
+      <div class="slide-mini" id="slideMini">
+        <div class="slide-mini-bg" id="slideBg"></div>
+        <div style="position:absolute;inset:0;padding:.75rem;display:flex;flex-direction:column;justify-content:flex-end;z-index:1">
+          <div class="slide-mini-eyebrow" id="previewEyebrow">Apresentação</div>
+          <div class="slide-mini-title" id="previewTitle">Título</div>
+          <div class="slide-mini-sub" id="previewSub">Subtítulo</div>
+        </div>
+        <div class="slide-mini-accent" id="slideAccent"></div>
+      </div>
+    </div>
+    <div class="slide-count" id="slideCount">— slides</div>
+    <div class="eyebrow" style="margin-bottom:.65rem">Blocos ativos</div>
+    <div class="preview-blocks" id="previewBlocks"></div>
+    <div class="preview-total" id="previewTotal"></div>
+  </aside>
+
 </section>
 
-</div>
+</div> <!-- fecha #app -->
 
 <div id="toastWrap"></div>
 
-<!-- ════════════════════════════════════════════════════
-     SCRIPTS - APENAS O MAIN.JS (MUDANÇA AQUI!)
-═══════════════════════════════════════════════════════ -->
+<!-- ========== APENAS UMA LINHA DE JAVASCRIPT AGORA! ========== -->
 <script type="module" src="js/main.js"></script>
 
 </body>
