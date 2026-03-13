@@ -208,6 +208,21 @@
         }
         .mode-btn-desc{font-size:.71rem;color:var(--muted);line-height:1.5;font-weight:300}
 
+        /* Seletor de modelo (novo) */
+        .modelo-row{
+            margin-top: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .modelo-row p{
+            color: var(--muted2);
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.1rem;
+        }
+        .modelo-row .mode-btn{
+            min-width: 140px;
+        }
+
         .splash-start{
             padding:.85rem 3rem;
             background:var(--a1);
@@ -820,9 +835,9 @@
             </button>
         </div>
 
-        <!-- Seletor de modelo -->
-        <div class="modelo-row" style="margin-top: 2rem;">
-            <p style="color: var(--muted2); margin-bottom: 0.5rem; font-size: 0.8rem; letter-spacing: 0.1rem;">ESCOLHA O MODELO DE LAYOUT</p>
+        <!-- Seletor de modelo (novo) -->
+        <div class="modelo-row">
+            <p>ESCOLHA O MODELO DE LAYOUT</p>
             <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
                 <button class="mode-btn modelo-btn selected" id="modeloBtn-classico" onclick="selectModelo('classico')">
                     <div class="mode-btn-name">Clássico</div>
