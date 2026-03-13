@@ -209,19 +209,6 @@
         .mode-btn-desc{font-size:.71rem;color:var(--muted);line-height:1.5;font-weight:300}
 
         /* Seletor de modelo (novo) */
-        .modelo-row{
-            margin-top: 2rem;
-            margin-bottom: 2.5rem;
-        }
-        .modelo-row p{
-            color: var(--muted2);
-            margin-bottom: 0.5rem;
-            font-size: 0.8rem;
-            letter-spacing: 0.1rem;
-        }
-        .modelo-row .mode-btn{
-            min-width: 140px;
-        }
 
         .splash-start{
             padding:.85rem 3rem;
@@ -414,6 +401,37 @@
         .preview-sep{height:1px;background:var(--border);margin:.3rem 0}
         .preview-total{
             text-align:center;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);padding-top:.4rem;
+        }
+        /* pill de modelo e tema na preview col */
+        .preview-meta{
+            display:flex;flex-direction:column;gap:.35rem;
+            margin-bottom:1rem;
+        }
+        .preview-meta-row{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:.38rem .6rem;border-radius:var(--r);
+            background:var(--glass);border:1px solid var(--border);
+        }
+        .preview-meta-label{
+            font-family:'DM Mono',monospace;font-size:.5rem;
+            letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+        }
+        .preview-meta-value{
+            font-family:'DM Mono',monospace;font-size:.58rem;
+            color:var(--a1);font-weight:500;letter-spacing:.04em;
+        }
+        /* thumb do modelo no preview — mini SVG 16:9 */
+        .preview-thumb{
+            width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:var(--r);
+            border:1px solid var(--border);margin-bottom:.65rem;
+            transition:border-color .3s;cursor:pointer;
+        }
+        .preview-thumb:hover{border-color:rgba(232,160,32,.3)}
+        .preview-thumb svg{display:block;width:100%;height:100%}
+        .preview-thumb-label{
+            text-align:center;font-family:'DM Mono',monospace;
+            font-size:.52rem;color:var(--muted);margin-bottom:.85rem;
+            letter-spacing:.1em;text-transform:uppercase;
         }
 
         /* ═══════════════════════════════════════════════════════════
@@ -924,57 +942,6 @@
             </button>
         </div>
 
-        <!-- Seletor de modelo (novo) -->
-        <div class="modelo-row">
-            <p>ESCOLHA O MODELO DE LAYOUT</p>
-            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-                <button class="mode-btn modelo-btn selected" id="modeloBtn-classico" onclick="selectModelo('classico')">
-                    <div class="mode-btn-name">Clássico</div>
-                    <div class="mode-btn-desc">Layout tradicional, elegante e atemporal</div>
-                </button>
-                <button class="mode-btn modelo-btn" id="modeloBtn-moderno" onclick="selectModelo('moderno')">
-                    <div class="mode-btn-name">Moderno</div>
-                    <div class="mode-btn-desc">Design arrojado, cores vibrantes e assimetria</div>
-                </button>
-                <button class="mode-btn modelo-btn" id="modeloBtn-minimalista" onclick="selectModelo('minimalista')">
-                    <div class="mode-btn-name">Minimalista</div>
-                    <div class="mode-btn-desc">Limpo, espaços amplos e tipografia marcante</div>
-                </button>
-                <button class="mode-btn modelo-btn" id="modeloBtn-cybergrid" onclick="selectModelo('cybergrid')">
-                    <div class="mode-btn-name">CyberGrid</div>
-                    <div class="mode-btn-desc">Grade tech, efeito neon e tipografia terminal</div>
-                </button>                
-                <button class="mode-btn modelo-btn" id="modeloBtn-brutal" onclick="selectModelo('brutal')">
-                    <div class="mode-btn-name">Brutal</div>
-                    <div class="mode-btn-desc">Blocos brutos, cores inversas e impacto máximo</div>
-                </button>                
-                <button class="mode-btn modelo-btn" id="modeloBtn-aurora" onclick="selectModelo('aurora')">
-                    <div class="mode-btn-name">Aurora</div>
-                    <div class="mode-btn-desc">Gradientes atmosféricos, orbes de luz e leveza</div>
-                </button>                
-                <button class="mode-btn modelo-btn" id="modeloBtn-noir" onclick="selectModelo('noir')">
-                    <div class="mode-btn-name">Noir</div>
-                    <div class="mode-btn-desc">Cinematográfico: preto + faixa de cor queimada</div>
-                </button>
-                <button class="mode-btn modelo-btn" id="modeloBtn-bauhaus" onclick="selectModelo('bauhaus')">
-                    <div class="mode-btn-name">Bauhaus</div>
-                    <div class="mode-btn-desc">Um círculo como composição inteira</div>
-                </button>
-                <button class="mode-btn modelo-btn" id="modeloBtn-revista" onclick="selectModelo('revista')">
-                    <div class="mode-btn-name">Revista</div>
-                    <div class="mode-btn-desc">Layout editorial de magazine de alto padrão</div>
-                </button>
-                <button class="mode-btn modelo-btn" id="modeloBtn-eclipse" onclick="selectModelo('eclipse')">
-                    <div class="mode-btn-name">Eclipse</div>
-                    <div class="mode-btn-desc">Portal de halos concêntricos com título no núcleo</div>
-                </button>
-                <button class="mode-btn modelo-btn" id="modeloBtn-lumina" onclick="selectModelo('lumina')">
-                    <div class="mode-btn-name">Lumina Prism</div>
-                    <div class="mode-btn-desc">Glassmorphism holográfico, refração e luz</div>
-                </button>
-            </div>
-        </div>
-
         <button class="splash-start" onclick="startBuilder()">
             Começar →
         </button>
@@ -1194,6 +1161,24 @@
                 <span class="preview-title">Preview</span>
                 <span class="preview-badge">Live</span>
             </div>
+
+            <!-- Thumbnail do modelo ativo (clicável → vai pro step modelo) -->
+            <div class="preview-thumb" id="previewThumb" title="Clique para escolher modelo"
+                 onclick="goStep('modelo')"></div>
+            <div class="preview-thumb-label" id="previewThumbLabel">— modelo —</div>
+
+            <!-- Pills de modelo e tema -->
+            <div class="preview-meta">
+                <div class="preview-meta-row">
+                    <span class="preview-meta-label">Modelo</span>
+                    <span class="preview-meta-value" id="previewModeloName">—</span>
+                </div>
+                <div class="preview-meta-row">
+                    <span class="preview-meta-label">Tema</span>
+                    <span class="preview-meta-value" id="previewThemeName">—</span>
+                </div>
+            </div>
+
             <!-- Slide mini preview -->
             <div class="slide-preview">
                 <div class="slide-mini" id="slideMini">
