@@ -9,4 +9,5 @@ const modelos = {
     bauhaus:     new ModeloBauhaus(),
     revista:     new ModeloRevista(),
     eclipse:     new ModeloEclipse(),
+    lumina:      new ModeloLuminaPrism(),
 };
