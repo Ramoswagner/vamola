@@ -32,7 +32,7 @@ class ModeloLuminaPrism extends ModeloBase {
         s.addShape(pres.shapes.RECTANGLE, {
             x, y, w, h,
             fill: { color: C.bg2 },
-            line: { color: '#FFFFFF', width: 0.5 },
+            line: { color: 'FFFFFF', width: 0.5 },
             transparency: 18
         });
         // Brilho no canto superior esquerdo (simula reflexo)
@@ -44,7 +44,7 @@ class ModeloLuminaPrism extends ModeloBase {
         // Linha fina de luz na parte superior
         s.addShape(pres.shapes.RECTANGLE, {
             x, y, w, h: 0.04,
-            fill: { color: '#FFFFFF' },
+            fill: { color: 'FFFFFF' },
             transparency: 78
         });
     }
@@ -66,7 +66,7 @@ class ModeloLuminaPrism extends ModeloBase {
         // Faixa de rodapé com vidro
         s.addShape(pres.shapes.RECTANGLE, {
             x: 0, y: H - 0.42, w: W, h: 0.42,
-            fill: { color: C.bg2 }, line: { color: '#FFFFFF', width: 0.2 },
+            fill: { color: C.bg2 }, line: { color: 'FFFFFF', width: 0.2 },
             transparency: 25
         });
         if (G.id.instName) {
