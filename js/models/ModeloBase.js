@@ -280,6 +280,7 @@ class ModeloBase {
 
         const team = projeto.team.filter(t => t.nome);
         const cols = Math.min(team.length, 4);
+        if (cols === 0) { this._adicionarRodape(s, pres, G, C, projeto.name); return 1; }
         const bw = (9.3 / cols) - 0.15;
 
         team.slice(0, 4).forEach((t, i) => {
@@ -313,6 +314,7 @@ class ModeloBase {
 
         const etapas = projeto.etapas.filter(e => e.titulo);
         const n = Math.min(etapas.length, 6);
+        if (n === 0) { this._adicionarRodape(s, pres, G, C, projeto.name); return 1; }
         const bw = 9.3 / n - 0.12;
 
         etapas.slice(0, n).forEach((e, i) => {
@@ -376,6 +378,7 @@ class ModeloBase {
 
         const inds = projeto.indicadores.filter(i => i.nome);
         const n = Math.min(inds.length, 4);
+        if (n === 0) { this._adicionarRodape(s, pres, G, C, projeto.name); return 1; }
         const bw = 9.3 / n - 0.15;
 
         inds.slice(0, n).forEach((ind, i) => {
@@ -408,6 +411,7 @@ class ModeloBase {
 
         const res = projeto.resultados.filter(r => r.metrica);
         const n = Math.min(res.length, 4);
+        if (n === 0) { this._adicionarRodape(s, pres, G, C, projeto.name); return 1; }
         const bw = 9.3 / n - 0.15;
 
         res.slice(0, n).forEach((r, i) => {
