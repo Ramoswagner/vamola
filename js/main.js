@@ -26,11 +26,8 @@ function selectMode(mode) {
 
 function selectModelo(modelo) {
   G.modelo = modelo;
-  // Atualiza grid de cards (passo 2)
-  renderModeloGrid();
-  // Compatibilidade retroativa com botões da splash
-  document.querySelectorAll('.modelo-btn').forEach(btn => btn.classList.remove('selected'));
-  document.getElementById('modeloBtn-' + modelo)?.classList.add('selected');
+  renderModeloGrid();   // atualiza cards do step 03
+  refreshPreview();     // atualiza thumb + pill na preview col
   const nome = MODELOS_META?.[modelo]?.name || modelo;
   toast(`Modelo "${nome}" selecionado`, 'info');
 }
