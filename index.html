@@ -1075,6 +1075,139 @@
             .nav-step-dot{ width:24px;height:24px;font-size:.52rem; }
             .nav-step{ min-width:36px; }
         }
+
+        /* ═══════════════════════════════════════════════════════════
+           PREVIEW — BOTTOM SHEET (mobile) + FAB
+           Visíveis apenas em < 768px via classe .mobile-sheet-active
+        ═══════════════════════════════════════════════════════════ */
+
+        /* Overlay escuro atrás do sheet */
+        #previewOverlay{
+            display:none;
+            position:fixed;inset:0;
+            background:rgba(0,0,0,.7);
+            backdrop-filter:blur(4px);
+            z-index:1100;
+            animation:fadeIn .25s var(--ease);
+        }
+        #previewOverlay.open{ display:block; }
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+        /* Bottom sheet container */
+        #previewSheet{
+            display:none;
+            position:fixed;left:0;right:0;bottom:0;
+            z-index:1200;
+            background:var(--bg2);
+            border-top:1px solid var(--border);
+            border-radius:18px 18px 0 0;
+            padding:0 1.1rem 80px; /* 80px = espaço acima da bottom nav */
+            max-height:82vh;
+            overflow-y:auto;
+            transform:translateY(100%);
+            transition:transform .35s var(--ease);
+        }
+        #previewSheet.open{
+            display:block;
+            transform:translateY(0);
+        }
+        /* Animação de entrada */
+        @keyframes sheetIn{
+            from{transform:translateY(100%)}
+            to{transform:translateY(0)}
+        }
+        #previewSheet.open{ animation:sheetIn .35s var(--ease) forwards; }
+
+        /* Handle de arrastar + header do sheet */
+        .sheet-handle{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:1rem 0 .75rem;
+            position:sticky;top:0;
+            background:var(--bg2);
+            border-bottom:1px solid var(--border);
+            margin-bottom:1.1rem;
+            z-index:1;
+        }
+        .sheet-drag{
+            width:36px;height:4px;border-radius:2px;
+            background:var(--border2);
+            position:absolute;top:.55rem;left:50%;transform:translateX(-50%);
+        }
+        .sheet-title{
+            font-family:'DM Mono',monospace;font-size:.55rem;
+            letter-spacing:.28em;text-transform:uppercase;color:var(--muted);
+        }
+        .sheet-badge{
+            padding:.18rem .5rem;border-radius:3px;
+            background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.2);
+            font-family:'DM Mono',monospace;font-size:.52rem;color:var(--a1);
+            letter-spacing:.1em;text-transform:uppercase;
+        }
+        .sheet-close{
+            width:28px;height:28px;border-radius:50%;
+            background:var(--bg4);border:1px solid var(--border2);
+            color:var(--muted2);font-size:.8rem;
+            display:flex;align-items:center;justify-content:center;
+            transition:all .2s;flex-shrink:0;
+        }
+        .sheet-close:hover{ background:var(--bg3);color:var(--text); }
+
+        /* FAB — botão flutuante de preview */
+        #previewFab{
+            display:none; /* só aparece em mobile via @media */
+            position:fixed;
+            right:1rem;
+            bottom:72px; /* acima da bottom nav */
+            z-index:1050;
+            width:48px;height:48px;
+            border-radius:50%;
+            background:var(--bg2);
+            border:1px solid var(--border2);
+            box-shadow:0 4px 20px rgba(0,0,0,.5),0 0 0 1px rgba(232,160,32,.1);
+            cursor:pointer;
+            transition:all .25s var(--ease);
+            overflow:hidden;
+            padding:0;
+        }
+        #previewFab:hover{
+            box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 0 1px rgba(232,160,32,.35);
+            transform:translateY(-2px) scale(1.06);
+        }
+        /* Thumbnail do modelo no FAB */
+        #previewFab .fab-thumb{
+            width:100%;height:100%;
+            display:flex;align-items:center;justify-content:center;
+            overflow:hidden;
+        }
+        #previewFab .fab-thumb svg{
+            width:100%;height:100%;
+            display:block;
+        }
+        /* Fallback: ícone olho se sem thumb */
+        #previewFab .fab-icon{
+            position:absolute;inset:0;
+            display:flex;align-items:center;justify-content:center;
+            font-size:1.1rem;
+            background:rgba(8,8,8,.55);
+            opacity:0;
+            transition:opacity .2s;
+        }
+        #previewFab:hover .fab-icon{ opacity:1; }
+        /* Pulsing ring quando preview muda */
+        #previewFab.updated::after{
+            content:'';position:absolute;inset:-3px;
+            border-radius:50%;border:2px solid var(--a1);
+            animation:fabPulse .6s var(--ease) forwards;
+        }
+        @keyframes fabPulse{
+            0%{opacity:1;transform:scale(1)}
+            100%{opacity:0;transform:scale(1.4)}
+        }
+
+        /* Exibir FAB e sheet apenas em mobile */
+        @media (max-width:767px){
+            #previewFab{ display:block; }
+        }
     </style>
 </head>
 <body>
@@ -1369,6 +1502,60 @@
         </aside>
 
     </section>
+</div>
+
+<!-- Preview FAB (mobile) -->
+<button id="previewFab" onclick="openPreviewSheet()" title="Ver preview">
+    <div class="fab-thumb" id="fabThumb"></div>
+    <div class="fab-icon">👁</div>
+</button>
+
+<!-- Overlay -->
+<div id="previewOverlay" onclick="closePreviewSheet()"></div>
+
+<!-- Bottom Sheet de Preview (mobile) -->
+<div id="previewSheet">
+    <div class="sheet-handle">
+        <div class="sheet-drag"></div>
+        <span class="sheet-title">Preview</span>
+        <span class="sheet-badge">Live</span>
+        <button class="sheet-close" onclick="closePreviewSheet()">✕</button>
+    </div>
+
+    <!-- Thumbnail do modelo ativo -->
+    <div class="preview-thumb" id="sheetThumb" onclick="closePreviewSheet();goStep('modelo')"
+         title="Clique para escolher modelo" style="margin-bottom:.5rem"></div>
+    <div class="preview-thumb-label" id="sheetThumbLabel" style="margin-bottom:.85rem">— modelo —</div>
+
+    <!-- Pills modelo / tema -->
+    <div class="preview-meta" style="margin-bottom:1rem">
+        <div class="preview-meta-row">
+            <span class="preview-meta-label">Modelo</span>
+            <span class="preview-meta-value" id="sheetModeloName">—</span>
+        </div>
+        <div class="preview-meta-row">
+            <span class="preview-meta-label">Tema</span>
+            <span class="preview-meta-value" id="sheetThemeName">—</span>
+        </div>
+    </div>
+
+    <!-- Slide mini capa -->
+    <div class="slide-preview" style="margin-bottom:.5rem">
+        <div class="slide-mini" id="sheetSlideMini">
+            <div class="slide-mini-bg" id="sheetSlideBg"></div>
+            <div style="position:absolute;inset:0;padding:.75rem;display:flex;flex-direction:column;justify-content:flex-end;z-index:1">
+                <div class="slide-mini-eyebrow" id="sheetEyebrow">Apresentação</div>
+                <div class="slide-mini-title" id="sheetTitle">Título</div>
+                <div class="slide-mini-sub" id="sheetSub">Subtítulo</div>
+            </div>
+            <div class="slide-mini-accent" id="sheetAccent"></div>
+        </div>
+    </div>
+    <div class="slide-count" id="sheetSlideCount" style="margin-bottom:.85rem">— slides</div>
+
+    <div class="eyebrow" style="margin-bottom:.5rem">Blocos ativos</div>
+    <div class="preview-blocks" id="sheetBlocks"></div>
+    <div class="preview-total" id="sheetTotal"></div>
 </div>
 
 <div id="toastWrap"></div>
