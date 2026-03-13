@@ -130,7 +130,7 @@ const THEMES = {
     name:'Graphite', desc:'Cinza escuro — minimalista e profissional',
     preview:['#111111','#1E1E1E','#575757','#9A9A9A','#E1E1E1'],
     C:{ bg:'111111',bg2:'1E1E1E',txt:'FFFFFF',muted:'9A9A9A',a1:'575757',a2:'9A9A9A',a3:'E1E1E1',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
-};
+}
 };
 
 // ════════════════════════════════════════════════════
