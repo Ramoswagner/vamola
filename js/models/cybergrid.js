@@ -158,8 +158,8 @@ class ModeloCyberGrid extends ModeloBase {
         if (projeto.leader) s.addText(`> ${projeto.leader}`, { x: 1.0, y: 4.9, w: 8, h: 0.3, fontSize: 11, color: C.muted, fontFace: 'Courier New' });
 
         const dt = [];
-        if (projeto.periodo_inicio) dt.push(new Date(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
-        if (projeto.periodo_fim)    dt.push(new Date(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_inicio) dt.push(ModeloBase.parseDate(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_fim)    dt.push(ModeloBase.parseDate(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
         if (dt.length) s.addText(dt.join(' >> '), { x: 1.0, y: 5.28, w: 8, h: 0.28, fontSize: 9, color: projeto.color || C.a2, fontFace: 'Courier New' });
 
         // Status
