@@ -146,8 +146,8 @@ class ModeloAurora extends ModeloBase {
         if (projeto.leader) s.addText(projeto.leader, { x: 1.2, y: H * 0.73, w: 8, h: 0.32, fontSize: 12, color: C.muted, fontFace: 'Calibri Light' });
 
         const dt = [];
-        if (projeto.periodo_inicio) dt.push(new Date(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
-        if (projeto.periodo_fim)    dt.push(new Date(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_inicio) dt.push(ModeloBase.parseDate(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_fim)    dt.push(ModeloBase.parseDate(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
         if (dt.length) s.addText(dt.join(' → '), { x: 1.2, y: H * 0.73 + 0.38, w: 8, h: 0.28, fontSize: 9, color: projeto.color || C.a2, fontFace: 'Calibri Light' });
 
         // Status
