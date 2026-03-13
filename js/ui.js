@@ -119,42 +119,46 @@ function refreshPreview() {
   if(!T) return;
   const C = T.C;
 
+  // ── helper: aplica nos dois destinos (col desktop + sheet mobile) ──
+  function syncEl(desktopId, sheetId, fn) {
+    const d = document.getElementById(desktopId);
+    const s = document.getElementById(sheetId);
+    if(d) fn(d);
+    if(s) fn(s);
+  }
+
   // ── slide mini (capa) ──
-  const bg = document.getElementById('slideBg');
-  if(bg) bg.style.background = `#${C.bg}`;
-
-  const acc = document.getElementById('slideAccent');
-  if(acc) acc.style.background = `linear-gradient(90deg,#${C.a1},#${C.a2})`;
-
-  const ey = document.getElementById('previewEyebrow');
-  const tl = document.getElementById('previewTitle');
-  const sb = document.getElementById('previewSub');
-  if(ey) { ey.style.color = `#${C.muted}`; ey.textContent = G.id.instName || 'Organização'; }
-  if(tl) { tl.style.color = `#${C.txt}`; tl.textContent = G.id.presTitle || 'Título da Apresentação'; }
-  if(sb) { sb.style.color = `#${C.muted}`; sb.textContent = G.id.presDate || 'Data'; }
+  syncEl('slideBg','sheetSlideBg', el => el.style.background = `#${C.bg}`);
+  syncEl('slideAccent','sheetAccent', el => el.style.background = `linear-gradient(90deg,#${C.a1},#${C.a2})`);
+  syncEl('previewEyebrow','sheetEyebrow', el => { el.style.color=`#${C.muted}`; el.textContent=G.id.instName||'Organização'; });
+  syncEl('previewTitle','sheetTitle', el => { el.style.color=`#${C.txt}`; el.textContent=G.id.presTitle||'Título da Apresentação'; });
+  syncEl('previewSub','sheetSub', el => { el.style.color=`#${C.muted}`; el.textContent=G.id.presDate||'Data'; });
 
   const slides = countSlides();
-  const cnt = document.getElementById('slideCount');
-  if(cnt) cnt.textContent = `${slides} slide${slides!==1?'s':''}`;
+  syncEl('slideCount','sheetSlideCount', el => el.textContent=`${slides} slide${slides!==1?'s':''}`);
 
   // ── thumbnail do modelo ──
-  const thumb = document.getElementById('previewThumb');
-  if(thumb && typeof svgModelThumb === 'function') {
-    thumb.innerHTML = svgModelThumb(G.modelo, C);
-  }
-  const thumbLabel = document.getElementById('previewThumbLabel');
-  if(thumbLabel) {
-    const m = MODELOS_META?.[G.modelo];
-    thumbLabel.textContent = m ? m.name : G.modelo;
+  const svgHtml = typeof svgModelThumb==='function' ? svgModelThumb(G.modelo,C) : '';
+  const mName   = MODELOS_META?.[G.modelo]?.name || G.modelo;
+
+  syncEl('previewThumb','sheetThumb', el => el.innerHTML = svgHtml);
+  syncEl('previewThumbLabel','sheetThumbLabel', el => el.textContent = mName);
+
+  // FAB: miniatura embutida + ring de atualização
+  const fab = document.getElementById('fabThumb');
+  if(fab) {
+    fab.innerHTML = svgHtml;
+    const fabBtn = document.getElementById('previewFab');
+    if(fabBtn) {
+      fabBtn.classList.remove('updated');
+      void fabBtn.offsetWidth; // reflow para reiniciar animação
+      fabBtn.classList.add('updated');
+    }
   }
 
   // ── pills modelo / tema ──
-  const modeloName = document.getElementById('previewModeloName');
-  if(modeloName) {
-    modeloName.textContent = MODELOS_META?.[G.modelo]?.name || G.modelo;
-  }
-  const themeName = document.getElementById('previewThemeName');
-  if(themeName) themeName.textContent = T.name || G.theme;
+  syncEl('previewModeloName','sheetModeloName', el => el.textContent = mName);
+  syncEl('previewThemeName','sheetThemeName',  el => el.textContent = T.name || G.theme);
 
   renderPreviewBlocks();
 }
@@ -175,27 +179,89 @@ function countSlides() {
 }
 
 function renderPreviewBlocks() {
+  const activeBlocks  = Object.entries(G.blocks).filter(([,b])=>b.enabled);
+  const inactiveBlocks= Object.entries(G.blocks).filter(([,b])=>!b.enabled);
+
+  const html =
+    activeBlocks.map(([,b])=>`
+      <div class="preview-block active">
+        <div class="preview-block-dot"></div>
+        <span>${b.label}</span>
+      </div>`).join('') +
+    inactiveBlocks.map(([,b])=>`
+      <div class="preview-block">
+        <div class="preview-block-dot"></div>
+        <span>${b.label}</span>
+      </div>`).join('');
+
+  const totalText = `${activeBlocks.length} de ${Object.keys(G.blocks).length} blocos ativos`;
+
+  // desktop col
   const el = document.getElementById('previewBlocks');
-  if(!el) return;
-  const activeBlocks = Object.entries(G.blocks).filter(([,b])=>b.enabled);
-  el.innerHTML = activeBlocks.map(([,b])=>`
-    <div class="preview-block active">
-      <div class="preview-block-dot"></div>
-      <span>${b.label}</span>
-    </div>
-  `).join('') + Object.entries(G.blocks).filter(([,b])=>!b.enabled).map(([,b])=>`
-    <div class="preview-block">
-      <div class="preview-block-dot"></div>
-      <span>${b.label}</span>
-    </div>
-  `).join('');
+  if(el) el.innerHTML = html;
   const total = document.getElementById('previewTotal');
-  if(total) total.textContent = `${activeBlocks.length} de ${Object.keys(G.blocks).length} blocos ativos`;
+  if(total) total.textContent = totalText;
+
+  // sheet mobile
+  const sheetEl = document.getElementById('sheetBlocks');
+  if(sheetEl) sheetEl.innerHTML = html;
+  const sheetTotal = document.getElementById('sheetTotal');
+  if(sheetTotal) sheetTotal.textContent = totalText;
 }
 
 // ════════════════════════════════════════════════════
-// PROJETOS
+// PREVIEW BOTTOM SHEET (mobile)
 // ════════════════════════════════════════════════════
+function openPreviewSheet() {
+  const sheet   = document.getElementById('previewSheet');
+  const overlay = document.getElementById('previewOverlay');
+  if(!sheet || !overlay) return;
+  sheet.style.display   = 'block';
+  overlay.classList.add('open');
+  // forçar reflow antes de adicionar .open para animação funcionar
+  void sheet.offsetHeight;
+  sheet.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePreviewSheet() {
+  const sheet   = document.getElementById('previewSheet');
+  const overlay = document.getElementById('previewOverlay');
+  if(!sheet || !overlay) return;
+  sheet.classList.remove('open');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  // esconde após a transição terminar
+  setTimeout(() => { sheet.style.display = 'none'; }, 360);
+}
+
+// ── Swipe down para fechar ────────────────────────
+(function initSheetSwipe() {
+  let startY = 0, isDragging = false;
+  document.addEventListener('touchstart', e => {
+    const sheet = document.getElementById('previewSheet');
+    if(sheet && sheet.classList.contains('open') && sheet.contains(e.target)) {
+      startY = e.touches[0].clientY;
+      isDragging = true;
+    }
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if(!isDragging) return;
+    const sheet = document.getElementById('previewSheet');
+    if(!sheet) return;
+    const dy = e.touches[0].clientY - startY;
+    if(dy > 0) sheet.style.transform = `translateY(${dy}px)`;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if(!isDragging) return;
+    isDragging = false;
+    const sheet = document.getElementById('previewSheet');
+    if(!sheet) return;
+    const dy = e.changedTouches[0].clientY - startY;
+    sheet.style.transform = '';
+    if(dy > 80) closePreviewSheet();
+  }, { passive: true });
+})();
 let pidCounter = 0;
 
 function addProject() {
