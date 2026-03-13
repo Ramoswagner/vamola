@@ -7,43 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
-/* ========== SEU CSS COMPLETO AQUI (O QUE VOCÊ JÁ TEM) ========== */
-/* COLE TODO O CONTEÚDO DA TAG <style> DO SEU ARQUIVO ORIGINAL AQUI */
-/* É MUITO GRANDE, MAS É EXATAMENTE O QUE VOCÊ JÁ TINHA */
-
+/* ========== CSS COMPLETO ========== */
 :root{
-  /* ── Solo preto-carvão com profundidade ── */
   --bg:#080808;
   --bg2:#0F0F0F;
   --bg3:#161616;
   --bg4:#1E1E1E;
-
-  /* ── Vidros escuros ── */
   --glass:rgba(255,255,255,.03);
   --glass2:rgba(255,255,255,.06);
-
-  /* ── Bordas sutis ── */
   --border:rgba(255,255,255,.07);
   --border2:rgba(255,255,255,.14);
-
-  /* ── Texto ── */
   --text:#F0EDE6;
   --muted:#5A5550;
   --muted2:#8A8480;
-
-  /* ── Acento: âmbar elétrico ── */
   --a1:#E8A020;
   --a2:#F5C842;
   --a3:#FDE68A;
-
-  /* ── Vermelho drama ── */
   --red:#E83A20;
-
-  /* ── Utilitários ── */
   --gold:#E8A020;
   --danger:#E83A20;
   --success:#28A060;
-
   --r:6px;--r-lg:10px;--r-xl:14px;
   --ease:cubic-bezier(.16,1,.3,1);
   --ease-back:cubic-bezier(.34,1.56,.64,1);
@@ -63,22 +46,17 @@ img{max-width:100%;display:block}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--a1);border-radius:2px}
 
-/* ═══════════════════════════════════════════════════════════
-   CANVAS PARTÍCULAS — fundo animado
-═══════════════════════════════════════════════════════════ */
 #particleCanvas{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   opacity:.55;
 }
 
-/* Ruído de película */
 body::after{
   content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   mix-blend-mode:overlay;
 }
 
-/* Linha diagonal decorativa */
 body::before{
   content:'';position:fixed;
   top:-20vh;right:-10vw;
@@ -94,27 +72,16 @@ body::before{
   50%{opacity:.25}
 }
 
-/* ═══════════════════════════════════════════════════════════
-   APP SHELL
-═══════════════════════════════════════════════════════════ */
 #app{position:relative;z-index:2;min-height:100vh}
-
-/* ═══════════════════════════════════════════════════════════
-   SCREENS
-═══════════════════════════════════════════════════════════ */
 .screen{display:none;min-height:100vh;animation:screenIn .5s var(--ease)}
 .screen.active{display:flex}
 @keyframes screenIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-/* ═══════════════════════════════════════════════════════════
-   SPLASH
-═══════════════════════════════════════════════════════════ */
 #splash{
   flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:3rem 2rem;position:relative;
 }
 
-/* Número de fundo — elemento decorativo gigante */
 #splash::before{
   content:'W';
   position:absolute;
@@ -149,7 +116,6 @@ body::before{
 }
 .splash-bird svg{width:28px;height:28px;fill:var(--bg)}
 
-/* Título em Bebas Neue — letras enormes empilhadas */
 .splash-title{
   font-family:'Bebas Neue',sans-serif;
   font-size:clamp(5rem,14vw,11rem);
@@ -159,7 +125,6 @@ body::before{
   color:var(--text);
   position:relative;
 }
-/* Linha dourada sob o título */
 .splash-title::after{
   content:'';display:block;
   width:60px;height:3px;
@@ -184,7 +149,6 @@ body::before{
   display:flex;flex-direction:column;align-items:flex-start;
   text-align:left;min-width:160px;position:relative;overflow:hidden;
 }
-/* Linha lateral esquerda como acento */
 .mode-btn::before{
   content:'';position:absolute;left:0;top:0;bottom:0;
   width:2px;background:var(--a1);
@@ -226,12 +190,7 @@ body::before{
 }
 .splash-start:hover::before{transform:translateX(100%)}
 
-/* ═══════════════════════════════════════════════════════════
-   BUILDER SHELL
-═══════════════════════════════════════════════════════════ */
 #builder{flex-direction:row;position:relative}
-
-/* ─── Step Nav ─── */
 .step-nav{
   width:220px;flex-shrink:0;
   background:var(--bg2);
@@ -306,7 +265,6 @@ body::before{
 }
 .btn-back-splash:hover{border-color:var(--border2);color:var(--text)}
 
-/* ─── Main Content ─── */
 .builder-main{flex:1;overflow-y:auto;padding:2.5rem 3rem 4rem;min-width:0;background:var(--bg)}
 .step-page{display:none;animation:screenIn .3s var(--ease)}
 .step-page.active{display:block}
@@ -317,7 +275,6 @@ body::before{
   border-bottom:1px solid var(--border);
   position:relative;
 }
-/* Número decorativo atrás do título */
 .page-header::before{
   content:attr(data-step);
   position:absolute;right:0;top:-1rem;
@@ -338,7 +295,6 @@ body::before{
 }
 .page-desc{font-size:.85rem;color:var(--muted2);font-weight:300;max-width:480px;line-height:1.65}
 
-/* ─── Live Preview ─── */
 .preview-col{
   width:280px;flex-shrink:0;
   background:var(--bg2);border-left:1px solid var(--border);
@@ -396,9 +352,6 @@ body::before{
   text-align:center;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);padding-top:.4rem;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   FORM ELEMENTS
-═══════════════════════════════════════════════════════════ */
 .field{display:flex;flex-direction:column;gap:.35rem}
 .field label{
   font-family:'DM Mono',monospace;
@@ -425,15 +378,11 @@ body::before{
 .frow.c2{grid-template-columns:1fr 1fr}
 .frow.c3{grid-template-columns:1fr 1fr 1fr}
 
-/* ═══════════════════════════════════════════════════════════
-   CARDS
-═══════════════════════════════════════════════════════════ */
 .card{
   background:var(--glass);border:1px solid var(--border);
   border-radius:var(--r-lg);padding:1.5rem;
   position:relative;overflow:hidden;
 }
-/* Linha dourada superior como acento de card */
 .card::before{
   content:'';position:absolute;top:0;left:0;right:0;
   height:1px;background:linear-gradient(90deg,transparent,var(--a1),transparent);
@@ -446,9 +395,6 @@ body::before{
 }
 .card-title-mark{width:2px;height:14px;border-radius:1px;background:var(--a1);flex-shrink:0}
 
-/* ═══════════════════════════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════════════════════════ */
 .btn{
   display:inline-flex;align-items:center;gap:.45rem;
   padding:.58rem 1.35rem;border-radius:var(--r);
@@ -498,9 +444,6 @@ body::before{
 }
 .btn-generate:hover::before{transform:translateX(100%)}
 
-/* ═══════════════════════════════════════════════════════════
-   BLOCKS (step 2)
-═══════════════════════════════════════════════════════════ */
 .block-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
 .block-card{
   border-radius:var(--r-lg);border:1px solid var(--border);
@@ -543,9 +486,6 @@ body::before{
 }
 .block-card.on .block-check{background:var(--a1);border-color:var(--a1);color:var(--bg)}
 
-/* ═══════════════════════════════════════════════════════════
-   PROJECT FORM
-═══════════════════════════════════════════════════════════ */
 .proj-tabs{display:flex;gap:.4rem;margin-bottom:1.5rem;flex-wrap:wrap}
 .proj-tab{
   padding:.45rem 1rem;border-radius:3px;
@@ -566,7 +506,6 @@ body::before{
 }
 .add-proj-btn:hover{background:rgba(232,160,32,.06);border-color:var(--a1)}
 
-/* Accordion */
 .accord{border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:.55rem}
 .accord-head{
   display:flex;align-items:center;gap:.65rem;padding:.9rem 1rem;
@@ -590,7 +529,6 @@ body::before{
 .accord-body{display:none;padding:1.25rem;background:var(--bg3)}
 .accord-body.open{display:block}
 
-/* Rep items */
 .rep-list{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.65rem}
 .rep-item{
   display:flex;align-items:flex-start;gap:.6rem;padding:.8rem;
@@ -617,7 +555,6 @@ body::before{
 }
 .btn-addrow:hover{background:rgba(232,160,32,.05);border-color:rgba(232,160,32,.45)}
 
-/* Image slots */
 .img-slot{
   border-radius:var(--r);border:1px dashed rgba(232,160,32,.2);
   background:var(--bg3);display:flex;flex-direction:column;align-items:center;
@@ -640,7 +577,6 @@ body::before{
 .img-grid.g2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
 .img-grid.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem}
 
-/* Toggle */
 .toggle-row{display:flex;align-items:center;gap:.6rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
 .toggle-row:last-child{border-bottom:none}
 .tog{
@@ -658,7 +594,6 @@ body::before{
 .toggle-name{font-size:.8rem;font-weight:500;color:var(--text)}
 .toggle-hint{font-size:.6rem;color:var(--muted);margin-top:.08rem}
 
-/* BA grid */
 .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
 .ba-panel{border-radius:var(--r);border:1px solid var(--border);overflow:hidden;background:var(--bg2)}
 .ba-head{padding:.5rem .9rem;font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:.35rem;font-family:'DM Mono',monospace}
@@ -666,9 +601,6 @@ body::before{
 .ba-head.aft{background:rgba(40,160,96,.06);color:var(--success);border-bottom:1px solid rgba(40,160,96,.1)}
 .ba-body{padding:.8rem;display:flex;flex-direction:column;gap:.55rem}
 
-/* ═══════════════════════════════════════════════════════════
-   IDENTITY STEP
-═══════════════════════════════════════════════════════════ */
 .logo-upload-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
 .logo-slot{
   border-radius:var(--r-lg);border:1px dashed rgba(232,160,32,.2);
@@ -681,9 +613,6 @@ body::before{
 .logo-slot img.prev{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none;padding:.5rem}
 .logo-slot img.prev.show{display:block}
 
-/* ═══════════════════════════════════════════════════════════
-   THEME STEP
-═══════════════════════════════════════════════════════════ */
 .theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .theme-card{
   border-radius:var(--r-xl);border:1px solid var(--border);
@@ -707,9 +636,6 @@ body::before{
 }
 .theme-card.selected .theme-sel-badge{display:inline-block}
 
-/* ═══════════════════════════════════════════════════════════
-   GENERATE STEP
-═══════════════════════════════════════════════════════════ */
 .gen-summary{
   background:var(--glass);border:1px solid var(--border);
   border-radius:var(--r-xl);padding:1.5rem;margin-bottom:1.25rem;
@@ -738,17 +664,11 @@ body::before{
 }
 .progress-msg{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);margin-top:.45rem;letter-spacing:.05em}
 
-/* ═══════════════════════════════════════════════════════════
-   STEP FOOTER
-═══════════════════════════════════════════════════════════ */
 .step-footer{
   display:flex;align-items:center;justify-content:space-between;
   margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);
 }
 
-/* ═══════════════════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════════════════ */
 #toastWrap{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.45rem;z-index:9999}
 .toast{
   padding:.6rem 1rem;border-radius:var(--r);font-size:.75rem;font-weight:500;
@@ -761,9 +681,6 @@ body::before{
 .toast.info{background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.25);color:var(--a2)}
 @keyframes toastIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 
-/* ═══════════════════════════════════════════════════════════
-   MISC
-═══════════════════════════════════════════════════════════ */
 .sep{height:1px;background:var(--border);margin:1.25rem 0}
 .tag{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .6rem;border-radius:3px;font-size:.62rem;font-weight:500;font-family:'DM Mono',monospace;letter-spacing:.05em}
 .tag-blue{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.2);color:var(--a1)}
@@ -777,7 +694,6 @@ body::before{
   content:'';position:absolute;left:0;top:0;bottom:0;
   width:2px;background:linear-gradient(to bottom,transparent,var(--a1),transparent);
 }
-
 </style>
 </head>
 <body>
@@ -786,7 +702,7 @@ body::before{
 
 <div id="app">
 
-<!-- ========== SPLASH - SEU HTML COMPLETO AQUI ========== -->
+<!-- ========== SPLASH ========== -->
 <section class="screen active" id="splash">
   <div class="splash-bird">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -822,7 +738,7 @@ body::before{
   </button>
 </section>
 
-<!-- ========== BUILDER - SEU HTML COMPLETO AQUI ========== -->
+<!-- ========== BUILDER ========== -->
 <section class="screen" id="builder">
 
   <!-- Step Nav -->
@@ -1039,7 +955,7 @@ body::before{
 
 <div id="toastWrap"></div>
 
-<!-- ========== APENAS UMA LINHA DE JAVASCRIPT AGORA! ========== -->
+<!-- ========== APENAS UMA LINHA DE JAVASCRIPT ========== -->
 <script type="module" src="js/main.js"></script>
 
 </body>
