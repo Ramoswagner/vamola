@@ -746,201 +746,441 @@ const MODELOS_META = {
   lumina:      { name:'Lumina Prism',  desc:'Glassmorphism, vidro holográfico e refração',   tags:['glassy','futurista','premium'] },
 };
 
-// ── SVG helpers privados ──────────────────────────
-function _R(x,y,w,h,fill,extra=''){
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${extra}/>`;
-}
-function _E(cx,cy,rx,ry,fill,op=1){
-  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" opacity="${op}"/>`;
-}
-function _C(cx,cy,r,fill,op=1){
-  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" opacity="${op}"/>`;
-}
-// Linha de texto simulada (retângulo arredondado)
+// ── SVG micro-helpers (text lines) ───────────────
 function _T(x,y,w,h,fill,op=0.5){
   return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" opacity="${op}" rx="1.5"/>`;
 }
-// Bloco de texto simulado — N linhas empilhadas
-function _TB(x,y,lineW,fill,n=3,lh=5,gap=9,op=0.5){
-  return Array.from({length:n},(_,i)=>_T(x,y+i*gap, i===n-1?lineW*0.62:lineW, lh, fill, op-(i*0.06))).join('');
-}
-// SVG container
-function _SVG(content){
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="100%" preserveAspectRatio="xMidYMid meet">${content}</svg>`;
+function _TB(x,y,lineW,fill,n=3,lh=5,gap=9,op=0.55){
+  return Array.from({length:n},(_,i)=>_T(x,y+i*gap,i===n-1?lineW*.6:lineW,lh,fill,Math.max(op-i*.08,.1))).join('');
 }
 
-// ── 11 thumbnails — um por modelo ────────────────
+// ── 11 thumbnails LUMINOSOS ───────────────────────
 function svgModelThumb(id, C) {
-  const bg=`#${C.bg}`, bg2=`#${C.bg2}`, txt=`#${C.txt}`, muted=`#${C.muted}`;
-  const a1=`#${C.a1}`, a2=`#${C.a2}`, a3=`#${C.a3||C.a2}`;
-  const teal=`#${C.teal||C.a2}`;
+  const bg  = `#${C.bg}`,  bg2 = `#${C.bg2}`;
+  const txt = `#${C.txt}`, mu  = `#${C.muted}`;
+  const a1  = `#${C.a1}`,  a2  = `#${C.a2}`;
+  const tl  = `#${C.teal||C.a2}`;
+  const p   = id.slice(0,4); // namespace prefix para IDs únicos no DOM
+
+  const O = `xmlns="http://www.w3.org/2000/svg"`;
+  const open = `<svg ${O} viewBox="0 0 320 180" width="100%" preserveAspectRatio="xMidYMid meet">`;
 
   switch(id) {
 
-    // ── Clássico: split vertical 56 / 44 + linha de acento ──
-    case 'classico': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_R(179,0,141,180,bg2)}
-      ${_R(0,176,180,4,a1)}
-      ${_R(0,176,70,4,a2)}
-      ${_T(18,42,52,3,a1,0.6)}
-      ${_TB(18,52,148,txt,4,6,12,0.75)}
-      ${[0,1,2].map(i=>_R(202,54+i*26,44,4,a1,`opacity="${0.3+i*0.15}"`)).join('')}
-      ${_R(202,54,8,4,a1,'opacity="0.8"')}
-      ${_R(202,80,8,4,a2,'opacity="0.8"')}
-      ${_R(202,106,8,4,teal,'opacity="0.8"')}
-    `);
+    /* ═══════════════════════════════════════════════
+       CLÁSSICO — split luminoso, glow de acento
+    ═══════════════════════════════════════════════ */
+    case 'classico': return `${open}
+      <defs>
+        <linearGradient id="${p}lg1" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".55"/>
+          <stop offset="100%" stop-color="${a2}" stop-opacity="0"/>
+        </linearGradient>
+        <radialGradient id="${p}rg1" cx="0%" cy="100%" r="80%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".22"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${p}gf1"><feGaussianBlur stdDeviation="7"/></filter>
+        <filter id="${p}gf2"><feGaussianBlur stdDeviation="3"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <rect x="180" width="140" height="180" fill="${bg2}"/>
+      <!-- glow atmosférico esquerdo -->
+      <ellipse cx="0" cy="180" rx="160" ry="130" fill="${a1}" opacity=".18" filter="url(#${p}gf1)"/>
+      <!-- sweep diagonal branca -->
+      <rect width="320" height="180" fill="url(#${p}lg1)"/>
+      <!-- acento esq: barra de luz -->
+      <rect x="0" y="172" width="180" height="4" fill="url(#${p}lg1)"/>
+      <rect x="0" y="172" width="70" height="4" fill="${a2}" opacity=".8" filter="url(#${p}gf2)"/>
+      <!-- texto esq -->
+      ${_T(18,38,55,3,a1,.7)}
+      ${_TB(18,49,148,txt,4,5,11,.8)}
+      <!-- col direita — blocos com dot de cor -->
+      ${[0,1,2].map((i,_,arr)=>{
+        const cols=[a1,a2,tl]; const y=48+i*28;
+        return `<circle cx="196" cy="${y+2}" r="3.5" fill="${cols[i]}" opacity=".9" filter="url(#${p}gf2)"/>
+                ${_T(205,y,88,5,txt,.55)}
+                ${_T(205,y+9,66,3,mu,.3)}`;
+      }).join('')}
+    </svg>`;
 
-    // ── Moderno: bloco superior a1 + divisor diagonal ──
-    case 'moderno': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_R(0,0,320,94,a1)}
-      ${_R(0,86,320,15,bg2)}
-      ${_R(0,94,320,86,bg)}
-      ${_R(0,0,320,3,a2)}
-      ${_T(18,14,200,18,bg,0.9)}
-      ${_T(18,40,130,10,bg,0.65)}
-      ${_T(18,57,90,6,bg,0.4)}
-      ${_TB(18,110,130,txt,2,5,11,0.65)}
-      ${[0,1,2].map(i=>_R(282,12+i*22,6,26,bg,`opacity="0.35"`)).join('')}
-    `);
+    /* ═══════════════════════════════════════════════
+       MODERNO — diagonal gradient header + glow orb
+    ═══════════════════════════════════════════════ */
+    case 'moderno': return `${open}
+      <defs>
+        <linearGradient id="${p}hg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${a1}"/>
+          <stop offset="100%" stop-color="${a2}"/>
+        </linearGradient>
+        <radialGradient id="${p}orb" cx="70%" cy="30%" r="50%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity=".25"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <clipPath id="${p}clip">
+          <polygon points="0,0 320,0 320,100 0,88"/>
+        </clipPath>
+        <filter id="${p}gf"><feGaussianBlur stdDeviation="10"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- header diagonal -->
+      <rect width="320" height="180" fill="url(#${p}hg)" clip-path="url(#${p}clip)"/>
+      <!-- glow orb no header -->
+      <ellipse cx="260" cy="35" rx="100" ry="70" fill="url(#${p}orb)"/>
+      <!-- shimmer sweep diagonal -->
+      <rect x="-40" y="0" width="80" height="180" fill="#ffffff" opacity=".07" transform="skewX(-18)" />
+      <!-- título no header -->
+      ${_T(18,18,200,17,'#000',0.85)}
+      ${_T(18,44,130,9,'#000',0.55)}
+      <!-- glow de borda diagonal -->
+      <rect width="320" height="3" fill="${a2}" opacity=".6"/>
+      <!-- corpo abaixo -->
+      ${_TB(18,108,140,txt,2,6,13,.65)}
+      <!-- dots de destaque -->
+      ${[0,1,2].map(i=>`<rect x="${258+i*16}" y="120" width="10" height="28" fill="${[a1,a2,tl][i]}" opacity=".5" rx="5"/>`).join('')}
+    </svg>`;
 
-    // ── Minimalista: linha única + tipografia leve ──
-    case 'minimalista': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_R(20,76,280,1,a1)}
-      ${_T(20,60,80,4,muted,0.55)}
-      ${_T(20,83,220,18,txt,0.88)}
-      ${_T(20,107,160,11,txt,0.65)}
-      ${_T(20,124,120,7,muted,0.38)}
-      ${_T(20,138,80,5,muted,0.25)}
-    `);
+    /* ═══════════════════════════════════════════════
+       MINIMALISTA — linha de luz, espaço, respiração
+    ═══════════════════════════════════════════════ */
+    case 'minimalista': return `${open}
+      <defs>
+        <linearGradient id="${p}lg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="${a1}" stop-opacity="0"/>
+          <stop offset="30%" stop-color="${a2}" stop-opacity=".9"/>
+          <stop offset="70%" stop-color="${a1}" stop-opacity=".9"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </linearGradient>
+        <radialGradient id="${p}rg" cx="50%" cy="50%" r="40%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".14"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${p}gf"><feGaussianBlur stdDeviation="4"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- glow radial centrado na linha -->
+      <ellipse cx="160" cy="82" rx="180" ry="55" fill="url(#${p}rg)"/>
+      <!-- linha de luz -->
+      <rect x="20" y="82" width="280" height="1.5" fill="url(#${p}lg)"/>
+      <rect x="20" y="82" width="280" height="1.5" fill="url(#${p}lg)" filter="url(#${p}gf)" opacity=".8"/>
+      <!-- eyebrow -->
+      ${_T(20,66,72,3,a1,.6)}
+      <!-- título grande -->
+      ${_T(20,90,230,16,txt,.9)}
+      ${_T(20,113,180,10,txt,.65)}
+      ${_T(20,130,130,7,mu,.4)}
+      ${_T(20,143,90,5,mu,.25)}
+    </svg>`;
 
-    // ── CyberGrid: grade + caixa neon + brackets HUD ──
+    /* ═══════════════════════════════════════════════
+       CYBERGRID — grade neon + orbe com glow intenso
+    ═══════════════════════════════════════════════ */
     case 'cybergrid': {
-      const gridH = Array.from({length:31},(_,i)=>
-        `<line x1="0" y1="${i*6}" x2="320" y2="${i*6}" stroke="${a1}" stroke-width="0.5" opacity="0.1"/>`).join('');
-      const gridV = Array.from({length:31},(_,i)=>
-        `<line x1="${i*10.67}" y1="0" x2="${i*10.67}" y2="180" stroke="${a1}" stroke-width="0.5" opacity="0.1"/>`).join('');
-      const corners = [
-        [18,22,1,1],[285,22,-1,1],[18,148,1,-1],[285,148,-1,-1]
-      ].map(([x,y,fx,fy])=>
-        `<line x1="${x}" y1="${y}" x2="${x+fx*14}" y2="${y}" stroke="${a1}" stroke-width="1.5" opacity="0.65"/>
-         <line x1="${x}" y1="${y}" x2="${x}" y2="${y+fy*14}" stroke="${a1}" stroke-width="1.5" opacity="0.65"/>`
-      ).join('');
-      return _SVG(`
-        ${_R(0,0,320,180,bg)}
-        ${gridH}${gridV}
-        ${_R(18,22,285,130,bg2,'opacity="0.65"')}
-        ${_R(18,22,285,2,a1,'opacity="0.7"')}
-        ${_R(18,22,2,130,a1,'opacity="0.7"')}
-        ${_T(30,32,70,4,a2,0.75)}
-        ${_T(30,44,220,14,a1,0.9)}
-        ${_T(30,65,170,8,a1,0.55)}
-        ${_T(30,80,110,5,muted,0.45)}
-        ${corners}
-      `);
+      const gH = Array.from({length:31},(_,i)=>
+        `<line x1="0" y1="${i*6}" x2="320" y2="${i*6}" stroke="${a1}" stroke-width=".4" opacity=".12"/>`).join('');
+      const gV = Array.from({length:32},(_,i)=>
+        `<line x1="${i*10.3}" y1="0" x2="${i*10.3}" y2="180" stroke="${tl}" stroke-width=".4" opacity=".1"/>`).join('');
+      return `${open}
+        <defs>
+          <radialGradient id="${p}orb1" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="${a1}" stop-opacity=".85"/>
+            <stop offset="50%" stop-color="${a1}" stop-opacity=".2"/>
+            <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="${p}orb2" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="${tl}" stop-opacity=".6"/>
+            <stop offset="100%" stop-color="${tl}" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="${p}gf1"><feGaussianBlur stdDeviation="18"/></filter>
+          <filter id="${p}gf2"><feGaussianBlur stdDeviation="3"/></filter>
+        </defs>
+        <rect width="320" height="180" fill="${bg}"/>
+        ${gH}${gV}
+        <!-- glow orb principal -->
+        <ellipse cx="252" cy="90" rx="90" ry="80" fill="url(#${p}orb1)" filter="url(#${p}gf1)"/>
+        <!-- glow orb secundário -->
+        <ellipse cx="60" cy="150" rx="55" ry="45" fill="url(#${p}orb2)" filter="url(#${p}gf1)"/>
+        <!-- HUD corners -->
+        ${[[18,20,1,1],[290,20,-1,1],[18,154,1,-1],[290,154,-1,-1]].map(([x,y,fx,fy])=>
+          `<line x1="${x}" y1="${y}" x2="${x+fx*16}" y2="${y}" stroke="${a1}" stroke-width="1.5" opacity=".8" filter="url(#${p}gf2)"/>
+           <line x1="${x}" y1="${y}" x2="${x}" y2="${y+fy*16}" stroke="${a1}" stroke-width="1.5" opacity=".8" filter="url(#${p}gf2)"/>`).join('')}
+        <!-- textos neon -->
+        ${_T(30,30,72,4,a2,.8)}
+        ${_T(30,43,210,13,a1,.9)}
+        ${_T(30,64,160,7,tl,.55)}
+        ${_T(30,78,100,5,mu,.4)}
+      </svg>`;
     }
 
-    // ── Brutal: bloco sólido + strip + acento ──
-    case 'brutal': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_R(0,0,200,180,a1)}
-      ${_R(174,0,44,180,bg2)}
-      ${_R(220,104,100,76,a2)}
-      ${_T(14,22,160,18,bg,0.9)}
-      ${_T(14,48,120,11,bg,0.68)}
-      ${_T(14,67,80,6,bg,0.42)}
-      ${_T(14,155,60,4,bg,0.3)}
-    `);
+    /* ═══════════════════════════════════════════════
+       BRUTAL — diagonal clipPath + alto contraste
+    ═══════════════════════════════════════════════ */
+    case 'brutal': return `${open}
+      <defs>
+        <clipPath id="${p}cp1">
+          <polygon points="0,0 210,0 170,180 0,180"/>
+        </clipPath>
+        <clipPath id="${p}cp2">
+          <polygon points="170,0 230,0 190,180 150,180"/>
+        </clipPath>
+        <linearGradient id="${p}lg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${a1}"/>
+          <stop offset="100%" stop-color="${a2}"/>
+        </linearGradient>
+        <filter id="${p}gf"><feGaussianBlur stdDeviation="8"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- bloco diagonal principal -->
+      <rect width="320" height="180" fill="url(#${p}lg)" clip-path="url(#${p}cp1)"/>
+      <!-- faixa intermediária -->
+      <rect width="320" height="180" fill="${a2}" clip-path="url(#${p}cp2)" opacity=".6"/>
+      <!-- glow no corte diagonal -->
+      <line x1="170" y1="0" x2="130" y2="180" stroke="${a2}" stroke-width="6" opacity=".4" filter="url(#${p}gf)"/>
+      <!-- textos no bloco -->
+      ${_T(14,22,155,18,bg,.9)}
+      ${_T(14,50,115,10,bg,.68)}
+      ${_T(14,68,85,6,bg,.42)}
+      <!-- acento canto inferior direito -->
+      <rect x="240" y="130" width="80" height="50" fill="${a1}" opacity=".15" rx="4"/>
+    </svg>`;
 
-    // ── Aurora: orbes difusos + névoa + linha de luz ──
-    case 'aurora': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_E(48,63,90,99,a1,0.13)}
-      ${_E(230,108,70,79,a2,0.13)}
-      ${_E(144,18,58,58,teal,0.10)}
-      ${_R(0,0,208,180,bg,'opacity="0.38"')}
-      ${_R(0,0,208,180,a1,'opacity="0.05"')}
-      ${_R(0,86,208,1,a2,'opacity="0.55"')}
-      ${_T(16,36,180,20,txt,0.82)}
-      ${_T(16,62,130,10,txt,0.55)}
-      ${_T(16,78,95,6,muted,0.4)}
-    `);
+    /* ═══════════════════════════════════════════════
+       AURORA — orbes atmosféricos com feGaussianBlur
+    ═══════════════════════════════════════════════ */
+    case 'aurora': return `${open}
+      <defs>
+        <radialGradient id="${p}o1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".8"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${p}o2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a2}" stop-opacity=".7"/>
+          <stop offset="100%" stop-color="${a2}" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${p}o3" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${tl}" stop-opacity=".65"/>
+          <stop offset="100%" stop-color="${tl}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${p}gf1"><feGaussianBlur stdDeviation="28"/></filter>
+        <filter id="${p}gf2"><feGaussianBlur stdDeviation="14"/></filter>
+        <linearGradient id="${p}glass" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="${bg}" stop-opacity=".72"/>
+          <stop offset="100%" stop-color="${bg}" stop-opacity=".22"/>
+        </linearGradient>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- orbes atmosféricos -->
+      <ellipse cx="60" cy="70" rx="100" ry="90" fill="url(#${p}o1)" filter="url(#${p}gf1)"/>
+      <ellipse cx="260" cy="110" rx="90" ry="80" fill="url(#${p}o2)" filter="url(#${p}gf1)"/>
+      <ellipse cx="160" cy="-10" rx="70" ry="65" fill="url(#${p}o3)" filter="url(#${p}gf2)"/>
+      <!-- glass overlay para área de conteúdo -->
+      <rect width="210" height="180" fill="url(#${p}glass)"/>
+      <!-- linha de separação luminosa -->
+      <line x1="200" y1="0" x2="200" y2="180" stroke="${a1}" stroke-width=".8" opacity=".2"/>
+      <!-- conteúdo -->
+      ${_T(16,32,80,3,a1,.7)}
+      ${_T(16,42,180,18,txt,.85)}
+      ${_T(16,68,140,9,txt,.6)}
+      ${_T(16,85,105,6,mu,.4)}
+    </svg>`;
 
-    // ── Noir: preto + faixa de cor + texto branco ──
-    case 'noir': return _SVG(`
-      ${_R(0,0,320,180,'#000000')}
-      ${_R(0,68,320,6,a1)}
-      ${_R(0,62,320,3,a1,'opacity="0.22"')}
-      ${_T(14,12,220,20,'#ffffff',0.88)}
-      ${_T(14,38,180,13,'#ffffff',0.68)}
-      ${_T(14,80,160,9,'#ffffff',0.42)}
-      ${_T(14,95,110,7,'#ffffff',0.3)}
-    `);
+    /* ═══════════════════════════════════════════════
+       NOIR — cinematic, queima de cor, glow dramático
+    ═══════════════════════════════════════════════ */
+    case 'noir': return `${open}
+      <defs>
+        <radialGradient id="${p}burn" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".9"/>
+          <stop offset="40%" stop-color="${a1}" stop-opacity=".3"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${p}gf1"><feGaussianBlur stdDeviation="12"/></filter>
+        <filter id="${p}gf2"><feGaussianBlur stdDeviation="3"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="#050505"/>
+      <!-- glow difuso centrado na faixa -->
+      <ellipse cx="160" cy="76" rx="260" ry="50" fill="url(#${p}burn)" filter="url(#${p}gf1)"/>
+      <!-- faixa de cor queimada -->
+      <rect y="72" width="320" height="8" fill="${a1}"/>
+      <rect y="72" width="320" height="8" fill="${a2}" opacity=".5" filter="url(#${p}gf2)"/>
+      <!-- halos acima e abaixo da faixa -->
+      <rect y="68" width="320" height="3" fill="${a1}" opacity=".3"/>
+      <rect y="80" width="320" height="2" fill="${a2}" opacity=".2"/>
+      <!-- textos brancos -->
+      ${_T(14,14,220,18,'#ffffff',.88)}
+      ${_T(14,40,175,11,'#ffffff',.65)}
+      ${_T(14,90,160,8,'#ffffff',.4)}
+      ${_T(14,106,110,6,'#ffffff',.28)}
+    </svg>`;
 
-    // ── Bauhaus: círculo dominante + acento + texto ──
-    case 'bauhaus': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_C(198,81,115,a1)}
-      ${_C(0,0,43,a2,0.28)}
-      ${_C(206,88,94,bg,'0.12')}
-      ${_T(14,18,140,20,txt,0.88)}
-      ${_T(14,46,105,11,txt,0.65)}
-      ${_R(14,66,50,2,a1,'opacity="0.7"')}
-      ${_T(14,74,82,6,muted,0.38)}
-    `);
+    /* ═══════════════════════════════════════════════
+       BAUHAUS — círculo com gradiente + glow externo
+    ═══════════════════════════════════════════════ */
+    case 'bauhaus': return `${open}
+      <defs>
+        <radialGradient id="${p}cg" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="${a2}"/>
+          <stop offset="50%" stop-color="${a1}"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity=".5"/>
+        </radialGradient>
+        <radialGradient id="${p}glw" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${p}gf1"><feGaussianBlur stdDeviation="16"/></filter>
+        <filter id="${p}gf2"><feGaussianBlur stdDeviation="5"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- glow externo do círculo -->
+      <circle cx="208" cy="88" r="110" fill="url(#${p}glw)" filter="url(#${p}gf1)"/>
+      <!-- círculo principal com gradiente -->
+      <circle cx="208" cy="88" r="100" fill="url(#${p}cg)"/>
+      <!-- inner circle escuro para profundidade -->
+      <circle cx="208" cy="88" r="68" fill="${bg}" opacity=".18"/>
+      <!-- mini círculo tl -->
+      <circle cx="22" cy="158" r="28" fill="${tl}" opacity=".25" filter="url(#${p}gf2)"/>
+      <!-- textos -->
+      ${_T(14,18,132,18,txt,.88)}
+      ${_T(14,45,100,10,txt,.65)}
+      <rect x="14" y="64" width="44" height="2" fill="${a1}" opacity=".75"/>
+      ${_T(14,72,80,6,mu,.38)}
+    </svg>`;
 
-    // ── Revista: espinha + 2 colunas editoriais ──
-    case 'revista': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_R(0,0,9,180,a1)}
-      ${_R(9,0,1,180,a1,'opacity="0.25"')}
-      ${_T(17,16,110,20,txt,0.88)}
-      ${_T(17,43,110,13,txt,0.65)}
-      ${_T(17,62,110,8,txt,0.5)}
-      ${_T(17,76,85,6,muted,0.33)}
-      ${_R(138,8,1,164,a1,'opacity="0.2"')}
-      ${[0,1,2].map(i=>`
-        ${_C(157,54+i*30,6,a2,0.75)}
-        ${_T(170,50+i*30,120,6,txt,0.55)}
-        ${_R(148,63+i*30,140,1,a1,'opacity="0.18"')}
-      `).join('')}
-    `);
+    /* ═══════════════════════════════════════════════
+       REVISTA — espinha com gradiente + shimmer
+    ═══════════════════════════════════════════════ */
+    case 'revista': return `${open}
+      <defs>
+        <linearGradient id="${p}sp" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${a2}"/>
+          <stop offset="100%" stop-color="${a1}"/>
+        </linearGradient>
+        <linearGradient id="${p}sw" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+          <stop offset="50%" stop-color="#ffffff" stop-opacity=".06"/>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="${p}gf"><feGaussianBlur stdDeviation="4"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- shimmer diagonal -->
+      <rect x="-40" width="400" height="180" fill="url(#${p}sw)" transform="skewX(-20)"/>
+      <!-- espinha com gradiente + glow -->
+      <rect width="9" height="180" fill="url(#${p}sp)"/>
+      <rect width="9" height="180" fill="url(#${p}sp)" opacity=".5" filter="url(#${p}gf)"/>
+      <!-- divisor de colunas -->
+      <line x1="148" y1="10" x2="148" y2="170" stroke="${a1}" stroke-width=".8" opacity=".2"/>
+      <!-- col esq -->
+      ${_T(17,18,110,18,txt,.88)}
+      ${_T(17,44,110,11,txt,.65)}
+      ${_T(17,63,110,8,txt,.48)}
+      ${_T(17,78,85,5,mu,.3)}
+      <!-- col dir — 3 items com dot luminoso -->
+      ${[0,1,2].map(i=>{
+        const y=44+i*32, c=[a1,a2,tl][i];
+        return `<circle cx="162" cy="${y+3}" r="4" fill="${c}" opacity=".9" filter="url(#${p}gf)"/>
+                ${_T(172,y,118,6,txt,.55)}
+                ${_T(172,y+10,90,4,mu,.3)}`;
+      }).join('')}
+    </svg>`;
 
-    // ── Eclipse: halos concêntricos + conteúdo à esquerda ──
-    case 'eclipse': {
-      const halos = [
-        [88,63,a1,0.07],[75,54,a2,0.10],[62,44,a1,0.13],
-        [50,36,a2,0.16],[35,25,a1,0.20],[20,14,a1,0.26]
-      ].map(([rx,ry,fill,op])=>_E(190,83,rx,ry,fill,op)).join('');
-      return _SVG(`
-        ${_R(0,0,320,180,bg)}
-        ${halos}
-        ${_R(0,0,104,180,bg,'opacity="0.52"')}
-        ${_T(12,20,82,18,txt,0.82)}
-        ${_T(12,44,70,10,txt,0.55)}
-        ${_T(12,60,60,7,muted,0.35)}
-      `);
-    }
+    /* ═══════════════════════════════════════════════
+       ECLIPSE — halos com radialGradient + glow core
+    ═══════════════════════════════════════════════ */
+    case 'eclipse': return `${open}
+      <defs>
+        <radialGradient id="${p}core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a2}" stop-opacity=".95"/>
+          <stop offset="40%" stop-color="${a1}" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${p}h1" cx="50%" cy="50%" r="50%">
+          <stop offset="60%" stop-color="transparent"/>
+          <stop offset="80%" stop-color="${a1}" stop-opacity=".35"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <radialGradient id="${p}h2" cx="50%" cy="50%" r="50%">
+          <stop offset="60%" stop-color="transparent"/>
+          <stop offset="80%" stop-color="${a2}" stop-opacity=".22"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <radialGradient id="${p}h3" cx="50%" cy="50%" r="50%">
+          <stop offset="60%" stop-color="transparent"/>
+          <stop offset="80%" stop-color="${tl}" stop-opacity=".15"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <filter id="${p}gf1"><feGaussianBlur stdDeviation="10"/></filter>
+        <filter id="${p}gf2"><feGaussianBlur stdDeviation="3"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- halos concêntricos -->
+      <ellipse cx="210" cy="90" rx="130" ry="105" fill="url(#${p}h3)"/>
+      <ellipse cx="210" cy="90" rx="100" ry="80" fill="url(#${p}h2)"/>
+      <ellipse cx="210" cy="90" rx="72" ry="58" fill="url(#${p}h1)"/>
+      <!-- núcleo com glow -->
+      <ellipse cx="210" cy="90" rx="40" ry="32" fill="url(#${p}core)"/>
+      <ellipse cx="210" cy="90" rx="40" ry="32" fill="${a1}" opacity=".35" filter="url(#${p}gf1)"/>
+      <!-- panel esq -->
+      <rect width="118" height="180" fill="${bg}" opacity=".55"/>
+      ${_T(12,22,82,16,txt,.85)}
+      ${_T(12,46,70,9,txt,.58)}
+      ${_T(12,63,58,6,mu,.38)}
+      <!-- acento linha -->
+      <line x1="12" y1="80" x2="90" y2="80" stroke="${a1}" stroke-width="1" opacity=".4" filter="url(#${p}gf2)"/>
+    </svg>`;
 
-    // ── Lumina Prism: glassmorphism + orbes + card ──
-    case 'lumina': return _SVG(`
-      ${_R(0,0,320,180,bg)}
-      ${_E(-32,-18,96,96,a1,0.13)}
-      ${_E(352,198,96,96,a2,0.13)}
-      ${_R(16,22,288,140,bg2,'fill-opacity="0.55" rx="6"')}
-      ${_R(16,22,288,140,'none',`stroke="${a3}" stroke-opacity="0.28" stroke-width="1" rx="6"`)}
-      ${_R(16,22,6,140,a1,'opacity="0.65" rx="3"')}
-      ${_R(16,22,288,2,'#ffffff','opacity="0.15" rx="6"')}
-      ${_T(30,36,200,16,txt,0.88)}
-      ${_R(30,58,50,1,a1,'opacity="0.55"')}
-      ${_T(30,65,160,8,txt,0.55)}
-      ${_T(30,79,120,6,muted,0.38)}
-      ${_T(30,91,90,5,muted,0.28)}
-    `);
+    /* ═══════════════════════════════════════════════
+       LUMINA PRISM — glass card, prism edge, orbes
+    ═══════════════════════════════════════════════ */
+    case 'lumina': return `${open}
+      <defs>
+        <linearGradient id="${p}bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".55"/>
+          <stop offset="50%" stop-color="${tl}" stop-opacity=".3"/>
+          <stop offset="100%" stop-color="${a2}" stop-opacity=".5"/>
+        </linearGradient>
+        <linearGradient id="${p}prism" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="${a2}"/>
+          <stop offset="33%"  stop-color="${tl}"/>
+          <stop offset="66%"  stop-color="${a1}"/>
+          <stop offset="100%" stop-color="${a2}"/>
+        </linearGradient>
+        <radialGradient id="${p}o1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".7"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${p}o2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a2}" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="${a2}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${p}gf1"><feGaussianBlur stdDeviation="20"/></filter>
+        <filter id="${p}gf2"><feGaussianBlur stdDeviation="4"/></filter>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- orbes de fundo -->
+      <ellipse cx="-20" cy="-10" rx="110" ry="100" fill="url(#${p}o1)" filter="url(#${p}gf1)"/>
+      <ellipse cx="340" cy="190" rx="110" ry="100" fill="url(#${p}o2)" filter="url(#${p}gf1)"/>
+      <!-- glass card -->
+      <rect x="14" y="18" width="292" height="146" fill="${bg2}" fill-opacity=".55" rx="8"/>
+      <rect x="14" y="18" width="292" height="146" fill="url(#${p}bg)" rx="8"/>
+      <!-- borda superior branca — efeito vidro -->
+      <rect x="14" y="18" width="292" height="2" fill="#ffffff" opacity=".2" rx="1"/>
+      <!-- aresta esq com gradiente -->
+      <rect x="14" y="18" width="4" height="146" fill="url(#${p}prism)" opacity=".9" rx="2"/>
+      <rect x="14" y="18" width="4" height="146" fill="url(#${p}prism)" opacity=".4" rx="2" filter="url(#${p}gf2)"/>
+      <!-- borda card -->
+      <rect x="14" y="18" width="292" height="146" fill="none" stroke="#ffffff" stroke-opacity=".14" stroke-width="1" rx="8"/>
+      <!-- conteúdo -->
+      ${_T(28,32,190,14,txt,.9)}
+      <rect x="28" y="52" width="48" height="1.5" fill="url(#${p}prism)" opacity=".8"/>
+      ${_T(28,60,155,8,txt,.6)}
+      ${_T(28,75,118,6,mu,.42)}
+      ${_T(28,88,90,5,mu,.3)}
+    </svg>`;
 
-    default: return _SVG(`${_R(0,0,320,180,bg)}${_T(120,80,80,10,a1,0.5)}`);
+    default: return `${open}<rect width="320" height="180" fill="${bg}"/>
+      <ellipse cx="160" cy="90" rx="80" ry="60" fill="${a1}" opacity=".2"/>
+    </svg>`;
   }
 }
 
