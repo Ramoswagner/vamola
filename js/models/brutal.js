@@ -116,8 +116,8 @@ class ModeloBrutal extends ModeloBase {
         }
 
         const dt = [];
-        if (projeto.periodo_inicio) dt.push(new Date(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
-        if (projeto.periodo_fim)    dt.push(new Date(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_inicio) dt.push(ModeloBase.parseDate(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_fim)    dt.push(ModeloBase.parseDate(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
         if (dt.length) {
             s.addText(dt.join(' → '), { x: W * 0.44, y: H * 0.6 + 0.42, w: W * 0.55, h: 0.28, fontSize: 10, color: C.a2, fontFace: 'Calibri', bold: true });
         }
