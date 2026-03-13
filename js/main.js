@@ -46,6 +46,7 @@ const G = {
 // ════════════════════════════════════════════════════
 // TEMAS
 // ════════════════════════════════════════════════════
+
 const THEMES = {
     oceano: {
         name:'Oceano', desc:'Azul profundo e cyan — autoridade e clareza',
@@ -73,64 +74,55 @@ const THEMES = {
         C:{ bg:'140A05',bg2:'2A1205',txt:'FFF7ED',muted:'B08070',a1:'B45309',a2:'F97316',a3:'FB923C',teal:'EA580C',gold:'FCD34D',danger:'EF4444' }
     },
     neon: {
-    name:'Neon', desc:'Cores vibrantes e elétricas — moderno e ousado',
-    preview:['#0F172A','#1E1B4B','#C026D3','#E879F9','#F0ABFC'],
-    C:{ bg:'0F172A',bg2:'1E1B4B',txt:'FFFFFF',muted:'A78BFA',a1:'C026D3',a2:'E879F9',a3:'F0ABFC',teal:'2DD4BF',gold:'F59E0B',danger:'EF4444' }
-  },
-  
-  solar: {
-    name:'Solar', desc:'Amarelo e laranja — energia e otimismo',
-    preview:['#1C1917','#2D1B0E','#EA580C','#F97316','#FDBA74'],
-    C:{ bg:'1C1917',bg2:'2D1B0E',txt:'FFF7ED',muted:'FDBA74',a1:'EA580C',a2:'F97316',a3:'FB923C',teal:'06B6D4',gold:'F59E0B',danger:'EF4444' }
-  },
-  
-  royal: {
-    name:'Royal', desc:'Roxo e dourado — elegância e sofisticação',
-    preview:['#0A041A','#1E1035','#7C3AED','#A78BFA','#FCD34D'],
-    C:{ bg:'0A041A',bg2:'1E1035',txt:'FFFFFF',muted:'A78BFA',a1:'7C3AED',a2:'A78BFA',a3:'C4B5FD',teal:'2DD4BF',gold:'FCD34D',danger:'EF4444' }
-  },
-  
-  corporate: {
-    name:'Corporate', desc:'Azul corporativo — profissional e confiável',
-    preview:['#0F172A','#1E293B','#2563EB','#3B82F6','#94A3B8'],
-    C:{ bg:'0F172A',bg2:'1E293B',txt:'FFFFFF',muted:'94A3B8',a1:'2563EB',a2:'3B82F6',a3:'60A5FA',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
-  },
-  
-  nature: {
-    name:'Nature', desc:'Verde e terra — sustentabilidade e crescimento',
-    preview:['#0A1409','#1A2E1A','#16A34A','#4ADE80','#D9F99D'],
-    C:{ bg:'0A1409',bg2:'1A2E1A',txt:'F0FFF4',muted:'86EFAC',a1:'16A34A',a2:'4ADE80',a3:'86EFAC',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
-  },
-  
-  sunset: {
-    name:'Sunset', desc:'Pôr do sol — romântico e acolhedor',
-    preview:['#1E0B1E','#2D1B2D','#E11D48','#FB7185','#FECDD3'],
-    C:{ bg:'1E0B1E',bg2:'2D1B2D',txt:'FFF1F2',muted:'FB7185',a1:'E11D48',a2:'FB7185',a3:'FDA4AF',teal:'06B6D4',gold:'FCD34D',danger:'EF4444' }
-  },
-  
-  ocean: {
-    name:'Ocean Deep', desc:'Azul escuro e turquesa — profundidade e calma',
-    preview:['#030712','#0F1F2F','#0891B2','#22D3EE','#A5F3FC'],
-    C:{ bg:'030712',bg2:'0F1F2F',txt:'FFFFFF',muted:'7DD3FC',a1:'0891B2',a2:'22D3EE',a3:'A5F3FC',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
-  },
-  
-  midnight: {
-    name:'Midnight', desc:'Azul meia-noite — misterioso e elegante',
-    preview:['#020617','#0F172A','#312E81','#4F46E5','#818CF8'],
-    C:{ bg:'020617',bg2:'0F172A',txt:'FFFFFF',muted:'818CF8',a1:'312E81',a2:'4F46E5',a3:'818CF8',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
-  },
-  
-  rose: {
-    name:'Rose Gold', desc:'Rosa e dourado — moderno e sofisticado',
-    preview:['#1C0F13','#2D1A21','#BE185D','#EC4899','#F9A8D4'],
-    C:{ bg:'1C0F13',bg2:'2D1A21',txt:'FFFFFF',muted:'F9A8D4',a1:'BE185D',a2:'EC4899',a3:'F9A8D4',teal:'14B8A6',gold:'FCD34D',danger:'EF4444' }
-  },
-  
-  graphite: {
-    name:'Graphite', desc:'Cinza escuro — minimalista e profissional',
-    preview:['#111111','#1E1E1E','#575757','#9A9A9A','#E1E1E1'],
-    C:{ bg:'111111',bg2:'1E1E1E',txt:'FFFFFF',muted:'9A9A9A',a1:'575757',a2:'9A9A9A',a3:'E1E1E1',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
-}
+        name:'Neon', desc:'Cores vibrantes e elétricas — moderno e ousado',
+        preview:['#0F172A','#1E1B4B','#C026D3','#E879F9','#F0ABFC'],
+        C:{ bg:'0F172A',bg2:'1E1B4B',txt:'FFFFFF',muted:'A78BFA',a1:'C026D3',a2:'E879F9',a3:'F0ABFC',teal:'2DD4BF',gold:'F59E0B',danger:'EF4444' }
+    },
+    solar: {
+        name:'Solar', desc:'Amarelo e laranja — energia e otimismo',
+        preview:['#1C1917','#2D1B0E','#EA580C','#F97316','#FDBA74'],
+        C:{ bg:'1C1917',bg2:'2D1B0E',txt:'FFF7ED',muted:'FDBA74',a1:'EA580C',a2:'F97316',a3:'FB923C',teal:'06B6D4',gold:'F59E0B',danger:'EF4444' }
+    },
+    royal: {
+        name:'Royal', desc:'Roxo e dourado — elegância e sofisticação',
+        preview:['#0A041A','#1E1035','#7C3AED','#A78BFA','#FCD34D'],
+        C:{ bg:'0A041A',bg2:'1E1035',txt:'FFFFFF',muted:'A78BFA',a1:'7C3AED',a2:'A78BFA',a3:'C4B5FD',teal:'2DD4BF',gold:'FCD34D',danger:'EF4444' }
+    },
+    corporate: {
+        name:'Corporate', desc:'Azul corporativo — profissional e confiável',
+        preview:['#0F172A','#1E293B','#2563EB','#3B82F6','#94A3B8'],
+        C:{ bg:'0F172A',bg2:'1E293B',txt:'FFFFFF',muted:'94A3B8',a1:'2563EB',a2:'3B82F6',a3:'60A5FA',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
+    },
+    nature: {
+        name:'Nature', desc:'Verde e terra — sustentabilidade e crescimento',
+        preview:['#0A1409','#1A2E1A','#16A34A','#4ADE80','#D9F99D'],
+        C:{ bg:'0A1409',bg2:'1A2E1A',txt:'F0FFF4',muted:'86EFAC',a1:'16A34A',a2:'4ADE80',a3:'86EFAC',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
+    },
+    sunset: {
+        name:'Sunset', desc:'Pôr do sol — romântico e acolhedor',
+        preview:['#1E0B1E','#2D1B2D','#E11D48','#FB7185','#FECDD3'],
+        C:{ bg:'1E0B1E',bg2:'2D1B2D',txt:'FFF1F2',muted:'FB7185',a1:'E11D48',a2:'FB7185',a3:'FDA4AF',teal:'06B6D4',gold:'FCD34D',danger:'EF4444' }
+    },
+    ocean: {
+        name:'Ocean Deep', desc:'Azul escuro e turquesa — profundidade e calma',
+        preview:['#030712','#0F1F2F','#0891B2','#22D3EE','#A5F3FC'],
+        C:{ bg:'030712',bg2:'0F1F2F',txt:'FFFFFF',muted:'7DD3FC',a1:'0891B2',a2:'22D3EE',a3:'A5F3FC',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
+    },
+    midnight: {
+        name:'Midnight', desc:'Azul meia-noite — misterioso e elegante',
+        preview:['#020617','#0F172A','#312E81','#4F46E5','#818CF8'],
+        C:{ bg:'020617',bg2:'0F172A',txt:'FFFFFF',muted:'818CF8',a1:'312E81',a2:'4F46E5',a3:'818CF8',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
+    },
+    rose: {
+        name:'Rose Gold', desc:'Rosa e dourado — moderno e sofisticado',
+        preview:['#1C0F13','#2D1A21','#BE185D','#EC4899','#F9A8D4'],
+        C:{ bg:'1C0F13',bg2:'2D1A21',txt:'FFFFFF',muted:'F9A8D4',a1:'BE185D',a2:'EC4899',a3:'F9A8D4',teal:'14B8A6',gold:'FCD34D',danger:'EF4444' }
+    },
+    graphite: {
+        name:'Graphite', desc:'Cinza escuro — minimalista e profissional',
+        preview:['#111111','#1E1E1E','#575757','#9A9A9A','#E1E1E1'],
+        C:{ bg:'111111',bg2:'1E1E1E',txt:'FFFFFF',muted:'9A9A9A',a1:'575757',a2:'9A9A9A',a3:'E1E1E1',teal:'14B8A6',gold:'F59E0B',danger:'EF4444' }
+    }
 };
 
 // ════════════════════════════════════════════════════
