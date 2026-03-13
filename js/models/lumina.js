@@ -332,8 +332,8 @@ class ModeloLuminaPrism extends ModeloBase {
             });
         }
         const dt = [];
-        if (projeto.periodo_inicio) dt.push(new Date(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
-        if (projeto.periodo_fim)    dt.push(new Date(projeto.periodo_fim).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_inicio) dt.push(ModeloBase.parseDate(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_fim)    dt.push(ModeloBase.parseDate(projeto.periodo_fim).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
         if (dt.length) {
             s.addText(dt.join(' → '), {
                 x: 1.5, y: 4.9, w: 8, h: 0.28,
@@ -522,7 +522,7 @@ class ModeloLuminaPrism extends ModeloBase {
                 // Card do marco
                 this._glassCard(s, pres, x - 1.5, i % 2 === 0 ? 1.6 : 3.5, 3.0, 1.3, C, projeto.color || C.a1);
                 if (m.data) {
-                    const dataStr = new Date(m.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                    const dataStr = ModeloBase.parseDate(m.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
                     s.addText(dataStr, {
                         x: x - 1.4, y: i % 2 === 0 ? 1.7 : 3.6, w: 2.8, h: 0.25,
                         fontSize: 8, color: C.a2, fontFace: 'Montserrat', bold: true
