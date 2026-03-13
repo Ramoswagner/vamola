@@ -1,4 +1,6 @@
-// main.js
+// js/main.js
+// Código principal da aplicação Wren
+
 import { carregarModelo } from './models/index.js';
 
 // ════════════════════════════════════════════════════
@@ -79,69 +81,41 @@ const THEMES = {
 // Selecionar e carregar um modelo
 window.selecionarModelo = async function(nomeModelo) {
     try {
-        // Mostrar loading
         document.body.style.cursor = 'wait';
         
-        // Se já tem um modelo carregado e é o mesmo, não recarrega
         if (G.modeloAtual && G.selectedModel === nomeModelo) {
             console.log(`✅ Modelo ${nomeModelo} já está carregado`);
             return;
         }
         
-        // CARREGA O MODELO (lazy loading) ⭐
         G.modeloAtual = await carregarModelo(nomeModelo);
         G.selectedModel = nomeModelo;
         
         console.log(`✅ Modelo ${nomeModelo} carregado com sucesso!`);
         
-        // Atualizar UI se necessário
-        atualizarUIModelo(nomeModelo);
-        
     } catch (error) {
         console.error(`❌ Erro ao carregar modelo ${nomeModelo}:`, error);
         toast(`Erro ao carregar modelo ${nomeModelo}`, 'err');
     } finally {
-        // Esconder loading
         document.body.style.cursor = 'default';
     }
 };
 
-// Atualizar interface quando modelo mudar
-function atualizarUIModelo(nomeModelo) {
-    // Destacar o modelo selecionado na UI
-    document.querySelectorAll('.modelo-card').forEach(card => {
-        card.classList.remove('selected');
-        if (card.dataset.modelo === nomeModelo) {
-            card.classList.add('selected');
-        }
-    });
-    
-    // Atualizar preview
-    refreshPreview();
-}
-
 // ════════════════════════════════════════════════════
-// FUNÇÕES DE GERAÇÃO PPTX (USANDO O MODELO CARREGADO)
+// FUNÇÕES DE GERAÇÃO PPTX
 // ════════════════════════════════════════════════════
 
 window.generatePptx = async function() {
     try {
-        // Se não tem modelo carregado, carrega o padrão
         if (!G.modeloAtual) {
             await window.selecionarModelo(G.selectedModel);
         }
         
         setProgress(true, 5, 'Iniciando...');
         
-        // PEGA O TEMA SELECIONADO
         const T = THEMES[G.theme];
-        
-        // CRIA APRESENTAÇÃO
         const pres = new PptxGenJS();
         pres.layout = 'LAYOUT_WIDE';
-        const W = 13.33, H = 7.5;
-        
-        // USA O MODELO CARREGADO para gerar slides! ⭐
         
         // Capa
         await tick('Capa...');
@@ -163,78 +137,65 @@ window.generatePptx = async function() {
         for (let i = 0; i < G.projects.length; i++) {
             const p = G.projects[i];
             
-            // Divisor do projeto
             await tick(`Divisor ${p.name || i+1}...`);
             G.modeloAtual.gerarSlideDivisor(pres, p, G, T, i);
             
-            // Objetivo
             if (G.blocks.objetivo?.enabled) {
                 await tick(`Objetivo ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideObjetivo(pres, p, T.C);
             }
             
-            // Equipe
             if (G.blocks.team?.enabled) {
                 await tick(`Equipe ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideEquipe(pres, p, T.C);
             }
             
-            // Etapas
             if (G.blocks.etapas?.enabled) {
                 await tick(`Etapas ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideEtapas(pres, p, T.C);
             }
             
-            // Marcos
             if (G.blocks.marcos?.enabled) {
                 await tick(`Marcos ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideMarcos(pres, p, T.C);
             }
             
-            // Indicadores
             if (G.blocks.indicadores?.enabled) {
                 await tick(`Indicadores ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideIndicadores(pres, p, T.C);
             }
             
-            // Resultados
             if (G.blocks.resultados?.enabled) {
                 await tick(`Resultados ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideResultados(pres, p, T.C);
             }
             
-            // Antes & Depois
             if (G.blocks.antesdepois?.enabled) {
                 await tick(`Antes/Depois ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideAntesDepois(pres, p, T.C);
             }
             
-            // Evidências
             if (G.blocks.evidencias?.enabled) {
                 await tick(`Evidências ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideEvidencias(pres, p, T.C);
             }
             
-            // Riscos
             if (G.blocks.riscos?.enabled) {
                 await tick(`Riscos ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideRiscos(pres, p, T.C);
             }
             
-            // Lições
             if (G.blocks.licoes?.enabled) {
                 await tick(`Lições ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideLicoes(pres, p, T.C);
             }
             
-            // Desafios
             if (G.blocks.desafios?.enabled) {
                 await tick(`Desafios ${p.name || i+1}...`);
                 G.modeloAtual.gerarSlideDesafios(pres, p, T.C);
             }
         }
         
-        // Encerramento
         if (G.blocks.encerramento?.enabled) {
             await tick('Encerramento...');
             G.modeloAtual.gerarSlideEncerramento(pres, G, T);
@@ -253,7 +214,10 @@ window.generatePptx = async function() {
     }
 };
 
-// Helper para progresso
+// ════════════════════════════════════════════════════
+// FUNÇÕES AUXILIARES
+// ════════════════════════════════════════════════════
+
 function setProgress(show, pct, msg) {
     const w = document.getElementById('progWrap');
     const b = document.getElementById('progBar');
@@ -263,15 +227,22 @@ function setProgress(show, pct, msg) {
     if (m) m.textContent = msg || '';
 }
 
-// Helper para ticks de progresso
 async function tick(msg) {
-    // Implementar lógica de progresso se necessário
     console.log(msg);
     await new Promise(r => setTimeout(r, 10));
 }
 
+function toast(msg, type = 'info') {
+    const w = document.getElementById('toastWrap');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    w.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+}
+
 // ════════════════════════════════════════════════════
-// FUNÇÕES DE NAVEGAÇÃO
+// FUNÇÕES DE NAVEGAÇÃO (DO HTML)
 // ════════════════════════════════════════════════════
 
 window.goStep = function(step) {
@@ -282,6 +253,10 @@ window.goStep = function(step) {
     const ns = document.getElementById('ns-' + step);
     if (ns) ns.classList.add('active');
     
+    if (step === 'generate') { 
+        renderGenSummary(); 
+        renderSlideList(); 
+    }
     refreshPreview();
 };
 
@@ -297,10 +272,6 @@ window.startBuilder = function() {
     goStep('identity');
 };
 
-// ════════════════════════════════════════════════════
-// FUNÇÕES DE MODO (single/portfolio/program)
-// ════════════════════════════════════════════════════
-
 window.selectMode = function(mode) {
     G.mode = mode;
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
@@ -311,6 +282,22 @@ function updateModeUI() {
     const labels = { single: '◻ Projeto Único', portfolio: '◫ Portfólio', program: '⊞ Programa' };
     const el = document.getElementById('modeTag');
     if (el) el.textContent = labels[G.mode];
+    const tabsWrap = document.getElementById('projTabsWrap');
+    if (tabsWrap) tabsWrap.style.display = G.mode === 'single' ? 'none' : 'block';
+    const t = document.getElementById('projStepTitle');
+    const d = document.getElementById('projStepDesc');
+    if (t) {
+        if (G.mode === 'single') {
+            t.textContent = 'Projeto';
+            d.textContent = 'Preencha as informações da sua iniciativa nos blocos abaixo.';
+        } else if (G.mode === 'portfolio') {
+            t.textContent = 'Portfólio';
+            d.textContent = 'Gerencie os projetos do portfólio e preencha as informações de cada um.';
+        } else {
+            t.textContent = 'Programa';
+            d.textContent = 'Projetos do programa estratégico. Cada um com seus blocos de conteúdo.';
+        }
+    }
 }
 
 // ════════════════════════════════════════════════════
@@ -356,7 +343,7 @@ function renderBlockGrid() {
     if (!el) return;
     el.innerHTML = Object.entries(G.blocks).map(([key, b]) => `
         <div class="block-card ${b.enabled ? 'on' : ''} ${b.required ? 'required' : ''}"
-             id="bc-${key}" onclick="${b.required ? '' : ''} toggleBlock('${key}')">
+             id="bc-${key}" onclick="toggleBlock('${key}')">
             <div class="block-icon">${b.icon}</div>
             <div class="block-name">${b.label}</div>
             <div class="block-desc">${b.desc}</div>
@@ -375,15 +362,12 @@ function refreshPreview() {
     if (!T) return;
     const C = T.C;
     
-    // Slide mini bg
     const bg = document.getElementById('slideBg');
     if (bg) bg.style.background = `#${C.bg}`;
     
-    // Accent
     const acc = document.getElementById('slideAccent');
     if (acc) acc.style.background = `linear-gradient(90deg,#${C.a1},#${C.a2})`;
     
-    // Texts
     const ey = document.getElementById('previewEyebrow');
     const tl = document.getElementById('previewTitle');
     const sb = document.getElementById('previewSub');
@@ -400,7 +384,6 @@ function refreshPreview() {
         sb.textContent = G.id.presDate || 'Data'; 
     }
     
-    // Slide count
     const slides = countSlides();
     const cnt = document.getElementById('slideCount');
     if (cnt) cnt.textContent = `${slides} slide${slides !== 1 ? 's' : ''}`;
@@ -409,12 +392,12 @@ function refreshPreview() {
 }
 
 function countSlides() {
-    let n = 1; // capa
-    if (G.mode !== 'single') n++; // sumario
+    let n = 1;
+    if (G.mode !== 'single') n++;
     const B = G.blocks;
     if (B.panorama?.enabled) n++;
     G.projects.forEach(() => {
-        n++; // divisor
+        n++;
         ['objetivo', 'team', 'etapas', 'marcos', 'indicadores', 'resultados', 
          'antesdepois', 'evidencias', 'riscos', 'licoes', 'desafios'].forEach(k => {
             if (B[k]?.enabled) n++;
@@ -448,10 +431,10 @@ function renderPreviewBlocks() {
 // ════════════════════════════════════════════════════
 
 let pidCounter = 0;
+const PROJ_COLORS = ['#2563EB', '#7C3AED', '#DB2777', '#D97706', '#059669', '#DC2626', '#0284C7', '#9333EA'];
 
 window.addProject = function() {
     const id = 'p' + (++pidCounter);
-    const PROJ_COLORS = ['#2563EB', '#7C3AED', '#DB2777', '#D97706', '#059669', '#DC2626', '#0284C7', '#9333EA'];
     const col = PROJ_COLORS[G.projects.length % PROJ_COLORS.length];
     
     G.projects.push({
@@ -514,17 +497,263 @@ window.triggerUp = function(id) {
     document.getElementById(id)?.click(); 
 };
 
+window.handleLogo = function(key, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = e => {
+        G.id[key] = e.target.result;
+        const prev = document.getElementById('prev-' + key);
+        if (prev) {
+            prev.src = e.target.result;
+            prev.classList.add('show');
+        }
+        const rm = document.getElementById('rm' + key.charAt(0).toUpperCase() + key.slice(1));
+        if (rm) rm.classList.add('show');
+        toast(file.name + ' carregado', 'ok');
+    };
+    r.readAsDataURL(file);
+};
+
+window.rmLogo = function(evt, key) {
+    evt.stopPropagation();
+    G.id[key] = null;
+    const prev = document.getElementById('prev-' + key);
+    if (prev) {
+        prev.src = '';
+        prev.classList.remove('show');
+    }
+};
+
+window.handleGlobal = function(key, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = e => {
+        G.id[key] = e.target.result;
+        const prev = document.getElementById('prev-' + key);
+        if (prev) {
+            prev.src = e.target.result;
+            prev.classList.add('show');
+        }
+        const rm = document.getElementById('rm' + key);
+        if (rm) rm.classList.add('show');
+    };
+    r.readAsDataURL(file);
+};
+
+window.rmGlobal = function(evt, key) {
+    evt.stopPropagation();
+    G.id[key] = null;
+    const prev = document.getElementById('prev-' + key);
+    if (prev) {
+        prev.src = '';
+        prev.classList.remove('show');
+    }
+};
+
+window.handleEvImg = function(pid, idx, input) {
+    const p = G.projects.find(p => p.id === pid);
+    if (!p) return;
+    const file = input.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = e => {
+        p.evidencias[idx] = e.target.result;
+        const prev = document.getElementById(`prev-ev-${pid}-${idx}`);
+        if (prev) {
+            prev.src = e.target.result;
+            prev.classList.add('show');
+        }
+    };
+    r.readAsDataURL(file);
+};
+
+window.rmEvImg = function(evt, pid, idx) {
+    evt.stopPropagation();
+    const p = G.projects.find(p => p.id === pid);
+    if (!p) return;
+    p.evidencias[idx] = null;
+    const prev = document.getElementById(`prev-ev-${pid}-${idx}`);
+    if (prev) {
+        prev.src = '';
+        prev.classList.remove('show');
+    }
+};
+
+window.handleBAImg = function(pid, side, input) {
+    const p = G.projects.find(p => p.id === pid);
+    if (!p) return;
+    const file = input.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = e => {
+        p.antesdepois[side + '_img'] = e.target.result;
+        const prev = document.getElementById(`prev-BA-${side}-${pid}`);
+        if (prev) {
+            prev.src = e.target.result;
+            prev.classList.add('show');
+        }
+    };
+    r.readAsDataURL(file);
+};
+
+window.rmBAImg = function(evt, pid, side) {
+    evt.stopPropagation();
+    const p = G.projects.find(p => p.id === pid);
+    if (!p) return;
+    p.antesdepois[side + '_img'] = null;
+    const prev = document.getElementById(`prev-BA-${side}-${pid}`);
+    if (prev) {
+        prev.src = '';
+        prev.classList.remove('show');
+    }
+};
+
 // ════════════════════════════════════════════════════
-// FUNÇÕES DE TOAST
+// FUNÇÕES DE FORMULÁRIOS (simplificadas)
 // ════════════════════════════════════════════════════
 
-function toast(msg, type = 'info') {
-    const w = document.getElementById('toastWrap');
-    const t = document.createElement('div');
-    t.className = `toast ${type}`;
-    t.textContent = msg;
-    w.appendChild(t);
-    setTimeout(() => t.remove(), 4000);
+function getProj(id) { 
+    return G.projects.find(p => p.id === id); 
+}
+
+window.pset = function(id, k, v) { 
+    const p = getProj(id); 
+    if (p) p[k] = v; 
+};
+
+window.psetD = function(id, o, k, v) { 
+    const p = getProj(id); 
+    if (p && p[o]) p[o][k] = v; 
+};
+
+window.psetR = function(pid, f, i, k, v) { 
+    const p = getProj(pid); 
+    if (p && p[f] && p[f][i]) p[f][i][k] = v; 
+};
+
+function esc(s) { 
+    return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); 
+}
+
+function renderAllForms() {
+    const container = document.getElementById('projectForms');
+    if (!container) return;
+    container.innerHTML = '';
+    G.projects.forEach(p => {
+        const wrap = document.createElement('div');
+        wrap.className = 'proj-form-wrap';
+        wrap.dataset.pid = p.id;
+        wrap.style.display = p.id === G.activeProjectId ? '' : 'none';
+        wrap.innerHTML = buildForm(p);
+        container.appendChild(wrap);
+    });
+}
+
+function buildForm(p) {
+    const num = G.projects.findIndex(x => x.id === p.id) + 1;
+    const canRemove = G.mode !== 'single';
+    
+    return `
+    <div class="proj-header-bar">
+        <div style="background:${p.color}; width:30px; height:30px; border-radius:4px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold">${String(num).padStart(2, '0')}</div>
+        <div style="flex:1">
+            <div style="font-weight:bold">${p.name || 'Novo Projeto'}</div>
+            <div style="font-size:0.7rem; color:var(--muted)">Preencha as informações abaixo</div>
+        </div>
+        ${canRemove ? `<button class="btn btn-danger btn-xs" onclick="removeProject('${p.id}')">Remover</button>` : ''}
+    </div>
+
+    <div class="card">
+        <div class="field">
+            <label>Nome do Projeto</label>
+            <input value="${esc(p.name)}" placeholder="Nome do projeto" oninput="pset('${p.id}','name',this.value);renderProjTabs()">
+        </div>
+        <div class="field">
+            <label>Líder / Responsável</label>
+            <input value="${esc(p.leader)}" placeholder="Nome do líder" oninput="pset('${p.id}','leader',this.value)">
+        </div>
+        <div class="frow c2">
+            <div class="field"><label>Início</label><input type="date" value="${p.periodo_inicio}" oninput="pset('${p.id}','periodo_inicio',this.value)"></div>
+            <div class="field"><label>Conclusão</label><input type="date" value="${p.periodo_fim}" oninput="pset('${p.id}','periodo_fim',this.value)"></div>
+        </div>
+        <div class="field">
+            <label>Status</label>
+            <select oninput="pset('${p.id}','status',this.value)">
+                ${['Concluído', 'Em andamento', 'Pausado', 'Cancelado'].map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="field">
+            <label>Objetivo</label>
+            <textarea rows="3" placeholder="Descreva o objetivo do projeto..." oninput="pset('${p.id}','objetivo',this.value)">${esc(p.objetivo)}</textarea>
+        </div>
+    </div>
+    `;
+}
+
+// ════════════════════════════════════════════════════
+// FUNÇÕES DE GENERATE STEP
+// ════════════════════════════════════════════════════
+
+function renderGenSummary() {
+    const el = document.getElementById('genSummary');
+    if (!el) return;
+    const checks = [
+        { label: 'Identidade — Nome da instituição', ok: !!G.id.instName, val: G.id.instName },
+        { label: 'Identidade — Título da apresentação', ok: !!G.id.presTitle, val: G.id.presTitle },
+        { label: 'Tema Visual', ok: true, val: THEMES[G.theme]?.name },
+        ...G.projects.map(p => ({ label: `Projeto: ${p.name || '(sem nome)'}`, ok: !!(p.name && p.objetivo), val: p.status }))
+    ];
+    el.innerHTML = `<div style="font-weight:bold; margin-bottom:1rem">Resumo da Apresentação</div>` +
+        checks.map(c => `
+        <div class="gen-row">
+            <div class="gen-status ${c.ok ? 'ok' : 'pending'}">${c.ok ? '✓' : '!'}</div>
+            <span class="gen-label">${c.label}</span>
+            <span class="gen-val">${c.ok ? c.val : 'pendente'}</span>
+        </div>
+    `).join('');
+}
+
+function renderSlideList() {
+    const el = document.getElementById('slideList');
+    if (!el) return;
+    const B = G.blocks;
+    let n = 0;
+    const rows = [];
+    const add = (label, main) => { n++; rows.push({ n, label, main }); };
+    
+    add('Capa', true);
+    if (G.mode !== 'single') add('Sumário', true);
+    if (B.panorama?.enabled) add('Panorama BI', true);
+    
+    G.projects.forEach((p, i) => {
+        const tag = `Projeto ${String(i + 1).padStart(2, '0')}${p.name ? ' · ' + p.name : ''}`;
+        add(`Divisor — ${tag}`, true);
+        if (B.objetivo?.enabled) add('Objetivo', false);
+        if (B.team?.enabled) add('Equipe', false);
+        if (B.etapas?.enabled) add('Etapas', false);
+        if (B.marcos?.enabled) add('Marcos / Timeline', false);
+        if (B.indicadores?.enabled) add('Indicadores KPI', false);
+        if (B.resultados?.enabled) add('Resultados', false);
+        if (B.antesdepois?.enabled) add('Antes & Depois', false);
+        if (B.evidencias?.enabled) add('Evidências', false);
+        if (B.riscos?.enabled) add('Riscos', false);
+        if (B.licoes?.enabled) add('Lições Aprendidas', false);
+        if (B.desafios?.enabled) add('Desafios Futuros', false);
+    });
+    
+    if (B.encerramento?.enabled) add('Encerramento', true);
+    
+    el.innerHTML = rows.map(r => `
+        <div class="slide-row ${r.main ? 'main' : 'sub'}">
+            <span class="slide-row-num">${String(r.n).padStart(2, '0')}</span>
+            ${r.label}
+        </div>
+    `).join('');
 }
 
 // ════════════════════════════════════════════════════
@@ -564,18 +793,14 @@ window.saveDraft = function() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Wren App iniciado!');
     
-    // Inicializar com um projeto padrão
     window.addProject();
-    
-    // Renderizar grids
-    renderBlockGrid();
     renderThemeGrid();
+    renderBlockGrid();
     renderPreviewBlocks();
     refreshPreview();
     
-    // NÃO carrega modelo ainda! Só quando precisar
     console.log('✅ Modelos serão carregados sob demanda (lazy loading)');
 });
 
-// Exportar G globalmente para acesso no console (opcional)
+// Exportar G para debugging (opcional)
 window.G = G;
