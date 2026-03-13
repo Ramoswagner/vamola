@@ -728,6 +728,95 @@
         .theme-card.selected .theme-sel-badge{display:inline-block}
 
         /* ═══════════════════════════════════════════════════════════
+           MODELO STEP — grid de cards com thumbnail SVG
+        ═══════════════════════════════════════════════════════════ */
+        .modelo-grid{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:1rem;
+        }
+        .modelo-card{
+            border-radius:var(--r-xl);border:1px solid var(--border);
+            overflow:hidden;cursor:pointer;transition:all .25s var(--ease);
+            background:var(--glass);position:relative;
+        }
+        .modelo-card::after{
+            content:'';position:absolute;inset:0;
+            background:radial-gradient(circle at 50% 0%,rgba(232,160,32,.07),transparent 70%);
+            opacity:0;transition:opacity .25s;pointer-events:none;
+        }
+        .modelo-card:hover{
+            border-color:rgba(232,160,32,.35);
+            transform:translateY(-3px);
+            box-shadow:0 16px 48px rgba(0,0,0,.55);
+        }
+        .modelo-card:hover::after{opacity:1}
+        .modelo-card.selected{
+            border-color:var(--a1);
+            box-shadow:0 0 0 1px var(--a1),0 0 40px rgba(232,160,32,.15);
+        }
+        .modelo-card.selected::after{opacity:1}
+
+        /* thumbnail 16:9 */
+        .modelo-thumb{
+            width:100%;aspect-ratio:16/9;overflow:hidden;
+            background:var(--bg2);position:relative;
+        }
+        .modelo-thumb svg{
+            display:block;width:100%;height:100%;
+        }
+        /* brilho de borda superior no hover/selected */
+        .modelo-thumb::after{
+            content:'';position:absolute;top:0;left:0;right:0;
+            height:2px;
+            background:linear-gradient(90deg,transparent,var(--a1),transparent);
+            opacity:0;transition:opacity .25s;
+        }
+        .modelo-card:hover .modelo-thumb::after,
+        .modelo-card.selected .modelo-thumb::after{opacity:1}
+
+        /* rodapé do card */
+        .modelo-info{
+            padding:.75rem .9rem .8rem;
+            background:var(--bg2);
+            border-top:1px solid var(--border);
+        }
+        .modelo-name{
+            font-family:'Bebas Neue',sans-serif;
+            font-size:1rem;letter-spacing:.07em;
+            color:var(--text);margin-bottom:.3rem;
+            display:flex;align-items:center;gap:.5rem;
+        }
+        .modelo-desc{
+            font-size:.64rem;color:var(--muted);
+            line-height:1.45;margin-bottom:.55rem;
+        }
+        .modelo-tags{
+            display:flex;gap:.3rem;flex-wrap:wrap;
+        }
+        .modelo-tag{
+            padding:.1rem .42rem;border-radius:3px;
+            font-family:'DM Mono',monospace;font-size:.5rem;
+            letter-spacing:.07em;text-transform:uppercase;
+            background:rgba(232,160,32,.06);
+            border:1px solid rgba(232,160,32,.14);
+            color:var(--muted2);
+        }
+        .modelo-card.selected .modelo-tag{
+            border-color:rgba(232,160,32,.3);color:var(--a1);
+        }
+        .modelo-sel-badge{
+            margin-left:auto;
+            padding:.1rem .42rem;border-radius:3px;
+            font-family:'DM Mono',monospace;font-size:.5rem;
+            letter-spacing:.07em;text-transform:uppercase;
+            background:rgba(232,160,32,.1);color:var(--a1);
+            border:1px solid rgba(232,160,32,.2);
+            display:none;
+        }
+        .modelo-card.selected .modelo-sel-badge{display:inline-block}
+
+        /* ═══════════════════════════════════════════════════════════
            GENERATE STEP
         ═══════════════════════════════════════════════════════════ */
         .gen-summary{
@@ -914,20 +1003,24 @@
                 <div class="nav-step-dot">02</div>
                 <div><div class="nav-step-label">Blocos</div><div class="nav-step-sub">Selecionar conteúdo</div></div>
             </div>
-            <div class="nav-step" id="ns-theme" onclick="goStep('theme')">
+            <div class="nav-step" id="ns-modelo" onclick="goStep('modelo')">
                 <div class="nav-step-dot">03</div>
+                <div><div class="nav-step-label">Modelo</div><div class="nav-step-sub">Layout visual</div></div>
+            </div>
+            <div class="nav-step" id="ns-theme" onclick="goStep('theme')">
+                <div class="nav-step-dot">04</div>
                 <div><div class="nav-step-label">Tema Visual</div><div class="nav-step-sub">Paleta de cores</div></div>
             </div>
 
             <div class="nav-section-label">Conteúdo</div>
             <div class="nav-step" id="ns-projects" onclick="goStep('projects')">
-                <div class="nav-step-dot" id="ns-proj-dot">04</div>
+                <div class="nav-step-dot" id="ns-proj-dot">05</div>
                 <div><div class="nav-step-label" id="ns-proj-label">Projetos</div><div class="nav-step-sub" id="ns-proj-sub">Preencher dados</div></div>
             </div>
 
             <div class="nav-section-label">Exportar</div>
             <div class="nav-step" id="ns-generate" onclick="goStep('generate')">
-                <div class="nav-step-dot">05</div>
+                <div class="nav-step-dot">06</div>
                 <div><div class="nav-step-label">Gerar PPTX</div><div class="nav-step-sub">Exportar apresentação</div></div>
             </div>
 
@@ -943,7 +1036,7 @@
             <!-- STEP: IDENTITY -->
             <div class="step-page active" id="step-identity">
                 <div class="page-header">
-                    <div class="page-num">Passo 01 / 05</div>
+                    <div class="page-num">Passo 01 / 06</div>
                     <h2 class="page-title display">Identidade</h2>
                     <p class="page-desc">Logos, nome da organização e informações que aparecerão na capa e no rodapé dos slides.</p>
                 </div>
@@ -997,13 +1090,27 @@
             <!-- STEP: BLOCKS -->
             <div class="step-page" id="step-blocks">
                 <div class="page-header">
-                    <div class="page-num">Passo 02 / 05</div>
+                    <div class="page-num">Passo 02 / 06</div>
                     <h2 class="page-title display">Blocos</h2>
                     <p class="page-desc">Monte sua apresentação como Lego — ative apenas o que faz sentido para o seu contexto.</p>
                 </div>
                 <div class="block-grid" id="blockGrid"></div>
                 <div class="step-footer">
                     <button class="btn btn-ghost" onclick="goStep('identity')">← Identidade</button>
+                    <button class="btn btn-primary" onclick="goStep('modelo')">Próximo: Modelo →</button>
+                </div>
+            </div>
+
+            <!-- STEP: MODELO -->
+            <div class="step-page" id="step-modelo">
+                <div class="page-header">
+                    <div class="page-num">Passo 03 / 06</div>
+                    <h2 class="page-title display">Modelo</h2>
+                    <p class="page-desc">Escolha o layout da sua apresentação. Os thumbnails refletem as cores do tema selecionado.</p>
+                </div>
+                <div class="modelo-grid" id="modeloGrid"></div>
+                <div class="step-footer">
+                    <button class="btn btn-ghost" onclick="goStep('blocks')">← Blocos</button>
                     <button class="btn btn-primary" onclick="goStep('theme')">Próximo: Tema →</button>
                 </div>
             </div>
@@ -1011,13 +1118,13 @@
             <!-- STEP: THEME -->
             <div class="step-page" id="step-theme">
                 <div class="page-header">
-                    <div class="page-num">Passo 03 / 05</div>
+                    <div class="page-num">Passo 04 / 06</div>
                     <h2 class="page-title display">Tema Visual</h2>
                     <p class="page-desc">Escolha a paleta que representa o tom da sua apresentação.</p>
                 </div>
                 <div class="theme-grid" id="themeGrid"></div>
                 <div class="step-footer">
-                    <button class="btn btn-ghost" onclick="goStep('blocks')">← Blocos</button>
+                    <button class="btn btn-ghost" onclick="goStep('modelo')">← Modelo</button>
                     <button class="btn btn-primary" onclick="goStep('projects')">Próximo: Projetos →</button>
                 </div>
             </div>
@@ -1025,7 +1132,7 @@
             <!-- STEP: PROJECTS -->
             <div class="step-page" id="step-projects">
                 <div class="page-header">
-                    <div class="page-num">Passo 04 / 05</div>
+                    <div class="page-num">Passo 05 / 06</div>
                     <h2 class="page-title display" id="projStepTitle">Projeto</h2>
                     <p class="page-desc" id="projStepDesc">Preencha as informações da sua iniciativa nos blocos abaixo.</p>
                 </div>
@@ -1045,7 +1152,7 @@
             <!-- STEP: GENERATE -->
             <div class="step-page" id="step-generate">
                 <div class="page-header">
-                    <div class="page-num">Passo 05 / 05</div>
+                    <div class="page-num">Passo 06 / 06</div>
                     <h2 class="page-title display">Gerar</h2>
                     <p class="page-desc">Sua apresentação está pronta para exportar. Confira o resumo e clique em Gerar.</p>
                 </div>
