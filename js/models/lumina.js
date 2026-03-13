@@ -32,7 +32,7 @@ class ModeloLuminaPrism extends ModeloBase {
         s.addShape(pres.shapes.RECTANGLE, {
             x, y, w, h,
             fill: { color: C.bg2 },
-            line: { color: 'FFFFFF', width: 0.5 },
+            line: { color: '#FFFFFF', width: 0.5 },
             transparency: 18
         });
         // Brilho no canto superior esquerdo (simula reflexo)
@@ -44,7 +44,7 @@ class ModeloLuminaPrism extends ModeloBase {
         // Linha fina de luz na parte superior
         s.addShape(pres.shapes.RECTANGLE, {
             x, y, w, h: 0.04,
-            fill: { color: 'FFFFFF' },
+            fill: { color: '#FFFFFF' },
             transparency: 78
         });
     }
@@ -66,7 +66,7 @@ class ModeloLuminaPrism extends ModeloBase {
         // Faixa de rodapé com vidro
         s.addShape(pres.shapes.RECTANGLE, {
             x: 0, y: H - 0.42, w: W, h: 0.42,
-            fill: { color: C.bg2 }, line: { color: 'FFFFFF', width: 0.2 },
+            fill: { color: C.bg2 }, line: { color: '#FFFFFF', width: 0.2 },
             transparency: 25
         });
         if (G.id.instName) {
@@ -502,34 +502,39 @@ class ModeloLuminaPrism extends ModeloBase {
         });
 
         const marcos = projeto.marcos.filter(m => m.entrega).slice(0, 6);
-        // Linha do tempo
-        s.addShape(pres.shapes.RECTANGLE, {
-            x: 0.7, y: 3.0, w: 9.0, h: 0.03,
-            fill: { color: C.a1 }, transparency: 50
-        });
-
-        marcos.forEach((m, i) => {
-            const x = 0.7 + i * (9.0 / (marcos.length - 1 || 1));
-            // Pino
+        if (marcos.length === 0) {
+            s.addText('Nenhum marco cadastrado.', { x: 0.55, y: 1.5, w: 9.3, h: 0.5, fontSize: 12, color: C.muted });
+        } else {
+            // Linha do tempo
             s.addShape(pres.shapes.RECTANGLE, {
-                x: x - 0.05, y: 2.95, w: 0.1, h: 0.15,
-                fill: { color: projeto.color || C.a1 }
+                x: 0.7, y: 3.0, w: 9.0, h: 0.03,
+                fill: { color: C.a1 }, transparency: 50
             });
-            // Card do marco
-            this._glassCard(s, pres, x - 1.5, i % 2 === 0 ? 1.6 : 3.5, 3.0, 1.3, C, projeto.color || C.a1);
-            if (m.data) {
-                const dataStr = new Date(m.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
-                s.addText(dataStr, {
-                    x: x - 1.4, y: i % 2 === 0 ? 1.7 : 3.6, w: 2.8, h: 0.25,
-                    fontSize: 8, color: C.a2, fontFace: 'Montserrat', bold: true
+
+            marcos.forEach((m, i) => {
+                const step = (marcos.length > 1) ? 9.0 / (marcos.length - 1) : 0;
+                const x = 0.7 + i * step;
+                // Pino
+                s.addShape(pres.shapes.RECTANGLE, {
+                    x: x - 0.05, y: 2.95, w: 0.1, h: 0.15,
+                    fill: { color: projeto.color || C.a1 }
                 });
-            }
-            s.addText(m.entrega, {
-                x: x - 1.4, y: i % 2 === 0 ? 2.0 : 3.9, w: 2.8, h: 0.6,
-                fontSize: 9, color: C.txt, fontFace: 'Montserrat Light',
-                lineSpacingMultiple: 1.2
+                // Card do marco
+                this._glassCard(s, pres, x - 1.5, i % 2 === 0 ? 1.6 : 3.5, 3.0, 1.3, C, projeto.color || C.a1);
+                if (m.data) {
+                    const dataStr = new Date(m.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                    s.addText(dataStr, {
+                        x: x - 1.4, y: i % 2 === 0 ? 1.7 : 3.6, w: 2.8, h: 0.25,
+                        fontSize: 8, color: C.a2, fontFace: 'Montserrat', bold: true
+                    });
+                }
+                s.addText(m.entrega, {
+                    x: x - 1.4, y: i % 2 === 0 ? 2.0 : 3.9, w: 2.8, h: 0.6,
+                    fontSize: 9, color: C.txt, fontFace: 'Montserrat Light',
+                    lineSpacingMultiple: 1.2
+                });
             });
-        });
+        }
 
         this._adicionarRodape(s, pres, G, C, projeto.name);
         return 1;
@@ -555,27 +560,30 @@ class ModeloLuminaPrism extends ModeloBase {
 
         const inds = projeto.indicadores.filter(i => i.nome).slice(0, 4);
         const n = inds.length;
-        const cardW = 9.3 / n - 0.15;
-
-        inds.forEach((ind, i) => {
-            const x = 0.55 + i * (cardW + 0.15);
-            this._glassCard(s, pres, x, 1.4, cardW, 5.0, C, projeto.color || C.a1);
-            s.addText(ind.realizado || '–', {
-                x: x + 0.15, y: 1.7, w: cardW - 0.3, h: 1.2,
-                fontSize: 46, color: C.txt, fontFace: 'Montserrat', bold: true
-            });
-            if (ind.meta) {
-                s.addText(`Meta: ${ind.meta}`, {
-                    x: x + 0.15, y: 3.0, w: cardW - 0.3, h: 0.28,
-                    fontSize: 9, color: C.muted, fontFace: 'Montserrat Light'
+        if (n === 0) {
+            s.addText('Nenhum indicador cadastrado.', { x: 0.55, y: 1.5, w: 9.3, h: 0.5, fontSize: 12, color: C.muted });
+        } else {
+            const cardW = 9.3 / n - 0.15;
+            inds.forEach((ind, i) => {
+                const x = 0.55 + i * (cardW + 0.15);
+                this._glassCard(s, pres, x, 1.4, cardW, 5.0, C, projeto.color || C.a1);
+                s.addText(ind.realizado || '–', {
+                    x: x + 0.15, y: 1.7, w: cardW - 0.3, h: 1.2,
+                    fontSize: 46, color: C.txt, fontFace: 'Montserrat', bold: true
                 });
-            }
-            s.addText(ind.nome, {
-                x: x + 0.15, y: 3.4, w: cardW - 0.3, h: 2.5,
-                fontSize: 10, color: C.txt, fontFace: 'Montserrat Light',
-                lineSpacingMultiple: 1.3
+                if (ind.meta) {
+                    s.addText(`Meta: ${ind.meta}`, {
+                        x: x + 0.15, y: 3.0, w: cardW - 0.3, h: 0.28,
+                        fontSize: 9, color: C.muted, fontFace: 'Montserrat Light'
+                    });
+                }
+                s.addText(ind.nome, {
+                    x: x + 0.15, y: 3.4, w: cardW - 0.3, h: 2.5,
+                    fontSize: 10, color: C.txt, fontFace: 'Montserrat Light',
+                    lineSpacingMultiple: 1.3
+                });
             });
-        });
+        }
 
         this._adicionarRodape(s, pres, G, C, projeto.name);
         return 1;
@@ -601,28 +609,31 @@ class ModeloLuminaPrism extends ModeloBase {
 
         const res = projeto.resultados.filter(r => r.metrica).slice(0, 4);
         const n = res.length;
-        const cardW = 9.3 / n - 0.15;
-
-        res.forEach((r, i) => {
-            const x = 0.55 + i * (cardW + 0.15);
-            this._glassCard(s, pres, x, 1.4, cardW, 5.0, C, projeto.color || C.a1);
-            s.addText(r.absoluto || '–', {
-                x: x + 0.15, y: 1.7, w: cardW - 0.3, h: 1.1,
-                fontSize: 40, color: C.txt, fontFace: 'Montserrat', bold: true
-            });
-            if (r.percentual) {
-                s.addText(r.percentual, {
-                    x: x + 0.15, y: 2.9, w: cardW - 0.3, h: 0.32,
-                    fontSize: 14, color: projeto.color || C.a2,
-                    fontFace: 'Montserrat', bold: true
+        if (n === 0) {
+            s.addText('Nenhum resultado cadastrado.', { x: 0.55, y: 1.5, w: 9.3, h: 0.5, fontSize: 12, color: C.muted });
+        } else {
+            const cardW = 9.3 / n - 0.15;
+            res.forEach((r, i) => {
+                const x = 0.55 + i * (cardW + 0.15);
+                this._glassCard(s, pres, x, 1.4, cardW, 5.0, C, projeto.color || C.a1);
+                s.addText(r.absoluto || '–', {
+                    x: x + 0.15, y: 1.7, w: cardW - 0.3, h: 1.1,
+                    fontSize: 40, color: C.txt, fontFace: 'Montserrat', bold: true
                 });
-            }
-            s.addText(r.metrica, {
-                x: x + 0.15, y: 3.4, w: cardW - 0.3, h: 2.6,
-                fontSize: 9.5, color: C.muted, fontFace: 'Montserrat Light',
-                lineSpacingMultiple: 1.35
+                if (r.percentual) {
+                    s.addText(r.percentual, {
+                        x: x + 0.15, y: 2.9, w: cardW - 0.3, h: 0.32,
+                        fontSize: 14, color: projeto.color || C.a2,
+                        fontFace: 'Montserrat', bold: true
+                    });
+                }
+                s.addText(r.metrica, {
+                    x: x + 0.15, y: 3.4, w: cardW - 0.3, h: 2.6,
+                    fontSize: 9.5, color: C.muted, fontFace: 'Montserrat Light',
+                    lineSpacingMultiple: 1.35
+                });
             });
-        });
+        }
 
         this._adicionarRodape(s, pres, G, C, projeto.name);
         return 1;
@@ -730,15 +741,20 @@ class ModeloLuminaPrism extends ModeloBase {
             fontSize: 22, color: C.txt, fontFace: 'Montserrat', bold: true
         });
 
-        projeto.riscos.filter(r => r.texto).slice(0, 5).forEach((r, i) => {
-            const y = 1.4 + i * 1.05;
-            this._glassCard(s, pres, 0.55, y, 9.3, 0.95, C, C.danger);
-            s.addText(`${i + 1}. ${r.texto}`, {
-                x: 0.75, y: y + 0.2, w: 8.9, h: 0.6,
-                fontSize: 11, color: C.txt, fontFace: 'Montserrat Light',
-                lineSpacingMultiple: 1.3
+        const riscos = projeto.riscos.filter(r => r.texto).slice(0, 5);
+        if (riscos.length === 0) {
+            s.addText('Nenhum risco cadastrado.', { x: 0.55, y: 1.5, w: 9.3, h: 0.5, fontSize: 12, color: C.muted });
+        } else {
+            riscos.forEach((r, i) => {
+                const y = 1.4 + i * 1.05;
+                this._glassCard(s, pres, 0.55, y, 9.3, 0.95, C, C.danger);
+                s.addText(`${i + 1}. ${r.texto}`, {
+                    x: 0.75, y: y + 0.2, w: 8.9, h: 0.6,
+                    fontSize: 11, color: C.txt, fontFace: 'Montserrat Light',
+                    lineSpacingMultiple: 1.3
+                });
             });
-        });
+        }
 
         this._adicionarRodape(s, pres, G, C, projeto.name);
         return 1;
@@ -762,15 +778,20 @@ class ModeloLuminaPrism extends ModeloBase {
             fontSize: 22, color: C.txt, fontFace: 'Montserrat', bold: true
         });
 
-        projeto.licoes.filter(l => l.texto).slice(0, 5).forEach((l, i) => {
-            const y = 1.4 + i * 1.05;
-            this._glassCard(s, pres, 0.55, y, 9.3, 0.95, C, C.teal || C.a2);
-            s.addText(`${i + 1}. ${l.texto}`, {
-                x: 0.75, y: y + 0.2, w: 8.9, h: 0.6,
-                fontSize: 11, color: C.txt, fontFace: 'Montserrat Light',
-                lineSpacingMultiple: 1.3
+        const licoes = projeto.licoes.filter(l => l.texto).slice(0, 5);
+        if (licoes.length === 0) {
+            s.addText('Nenhuma lição cadastrada.', { x: 0.55, y: 1.5, w: 9.3, h: 0.5, fontSize: 12, color: C.muted });
+        } else {
+            licoes.forEach((l, i) => {
+                const y = 1.4 + i * 1.05;
+                this._glassCard(s, pres, 0.55, y, 9.3, 0.95, C, C.teal || C.a2);
+                s.addText(`${i + 1}. ${l.texto}`, {
+                    x: 0.75, y: y + 0.2, w: 8.9, h: 0.6,
+                    fontSize: 11, color: C.txt, fontFace: 'Montserrat Light',
+                    lineSpacingMultiple: 1.3
+                });
             });
-        });
+        }
 
         this._adicionarRodape(s, pres, G, C, projeto.name);
         return 1;
