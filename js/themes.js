@@ -186,4 +186,73 @@ const THEMES = {
     preview:['#0f0508','#200c12','#c2185b','#f06292','#ffd700'],
     C:{ bg:'0f0508',bg2:'200c12',txt:'fff0f5',muted:'b07080',a1:'c2185b',a2:'f06292',a3:'f8bbd0',teal:'e91e8c',gold:'ffd700',danger:'d32f2f' }
   },
+
+  // ════════════════════════════════════════════════════
+  // TEMAS 2026 / 2027
+  // Dinamismo, disrupção, tecnologia, água, vidro
+  // ════════════════════════════════════════════════════
+
+  // 26-01: Aqua Funda — transparência líquida, profundidade oceânica
+  aquafunda: {
+    name:'Aqua Funda',
+    desc:'Azul oceânico e ciano cristalino — transparência líquida e profundidade',
+    preview:['#00121c','#002538','#00b4d8','#90e0ef','#caf0f8'],
+    C:{ bg:'00121c',bg2:'002538',txt:'e0f8ff',muted:'4a8fa8',a1:'00b4d8',a2:'90e0ef',a3:'caf0f8',teal:'0096c7',gold:'f4d35e',danger:'e63946' }
+  },
+
+  // 26-02: Cristal Polar — vidro fosco, gelo, reflexo frio
+  cristalpolar: {
+    name:'Cristal Polar',
+    desc:'Gelo translúcido e prata glacial — vidro fosco e reflexos frios',
+    preview:['#060e1a','#0d1b2e','#48cae4','#ade8f4','#e8f4f8'],
+    C:{ bg:'060e1a',bg2:'0d1b2e',txt:'f0f8ff',muted:'6a9ab8',a1:'48cae4',a2:'ade8f4',a3:'e8f4f8',teal:'00b4d8',gold:'ffd166',danger:'ef476f' }
+  },
+
+  // 26-03: Plasma Quente — gradient mesh orgânico, disrupção neon
+  plasmaquente: {
+    name:'Plasma Quente',
+    desc:'Magenta e violeta elétrico — gradient mesh orgânico e disrupção total',
+    preview:['#0a0010','#14002a','#ff006e','#8338ec','#ffbe0b'],
+    C:{ bg:'0a0010',bg2:'14002a',txt:'fff0ff',muted:'8050a0',a1:'ff006e',a2:'8338ec',a3:'ff85c2',teal:'3a86ff',gold:'ffbe0b',danger:'ff006e' }
+  },
+
+  // 26-04: Obsidiana — vulcânico, negro denso + dourado queimado
+  obsidiana: {
+    name:'Obsidiana',
+    desc:'Preto vulcânico e ouro queimado — peso e impacto sem concessões',
+    preview:['#050404','#100c08','#c9a84c','#e8c97a','#f5e1a4'],
+    C:{ bg:'050404',bg2:'100c08',txt:'f5ebe0',muted:'7a6a5a',a1:'c9a84c',a2:'e8c97a',a3:'f5e1a4',teal:'b5835a',gold:'c9a84c',danger:'c0392b' }
+  },
+
+  // 26-05: Argila Digital — terracota muted, tech warmth 2026
+  argiladigital: {
+    name:'Argila Digital',
+    desc:'Terracota muted e bege tech — o warm tone digital de 2026',
+    preview:['#1a1210','#2a1e1a','#d4785a','#e8a898','#f5d5cc'],
+    C:{ bg:'1a1210',bg2:'2a1e1a',txt:'f5ede8',muted:'9a7d72',a1:'d4785a',a2:'e8a898',a3:'f5d5cc',teal:'6b9e8e',gold:'d4a96a',danger:'c0392b' }
+  },
+
+  // 26-06: Cromo Prisma — prata + arco-íris de borda, iridescente
+  cromoprisma: {
+    name:'Cromo Prisma',
+    desc:'Prata metálico e borda iridescente — sofisticação futurista e prisma de luz',
+    preview:['#0c0d10','#1a1c22','#a8b8d0','#c8d8f0','#b090e0'],
+    C:{ bg:'0c0d10',bg2:'1a1c22',txt:'f0f2f8',muted:'7080a0',a1:'a8b8d0',a2:'c8d8f0',a3:'e8eef8',teal:'b090e0',gold:'d0b880',danger:'e05070' }
+  },
+
+  // 26-07: Void — preto absoluto, 1 acento cirúrgico, minimalismo extremo
+  void: {
+    name:'Void',
+    desc:'Preto absoluto e magenta cirúrgico — onde o vazio é a mensagem',
+    preview:['#000000','#0a0a0a','#e879f9','#f0abfc','#fae8ff'],
+    C:{ bg:'000000',bg2:'0a0a0a',txt:'ffffff',muted:'555555',a1:'e879f9',a2:'f0abfc',a3:'fae8ff',teal:'e879f9',gold:'fbbf24',danger:'ef4444' }
+  },
+
+  // 26-08: Biolum — bioluminescência, fundo abisal + luz viva de criaturas
+  biolum: {
+    name:'Biolum',
+    desc:'Verde e ciano bioluminescente sobre abismo — luz viva no escuro total',
+    preview:['#000d0f','#001518','#00f5a0','#00d4e0','#80ffe8'],
+    C:{ bg:'000d0f',bg2:'001518',txt:'e0fff5',muted:'2a7a60',a1:'00f5a0',a2:'00d4e0',a3:'80ffe8',teal:'00c9b8',gold:'ffe066',danger:'ff4560' }
+  },
 };
