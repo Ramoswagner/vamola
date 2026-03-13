@@ -744,6 +744,9 @@ const MODELOS_META = {
   revista:     { name:'Revista',       desc:'Espinha vertical, duas colunas editoriais',     tags:['editorial','magazine','coluna'] },
   eclipse:     { name:'Eclipse',       desc:'Halos concêntricos, foco no núcleo do portal',  tags:['orbital','dramático','foco'] },
   lumina:      { name:'Lumina Prism',  desc:'Glassmorphism, vidro holográfico e refração',   tags:['glassy','futurista','premium'] },
+  aqua:        { name:'Aqua',          desc:'Camadas líquidas, ondas e transparência de água', tags:['água','fluido','profundidade'] },
+  mesh:        { name:'Mesh',          desc:'Gradient mesh orgânico, blobs de cor sobrepostos', tags:['orgânico','fluido','2026'] },
+  void:        { name:'Void',          desc:'Preto absoluto, 1 acento — tipografia como design', tags:['minimalismo','editorial','silêncio'] },
 };
 
 // ── SVG micro-helpers (text lines) ───────────────
@@ -1176,6 +1179,121 @@ function svgModelThumb(id, C) {
       ${_T(28,60,155,8,txt,.6)}
       ${_T(28,75,118,6,mu,.42)}
       ${_T(28,88,90,5,mu,.3)}
+    </svg>`;
+
+    /* ═══════════════════════════════════════════════
+       AQUA — camadas de onda, luz refratada, vidro-água
+    ═══════════════════════════════════════════════ */
+    case 'aqua': return `${open}
+      <defs>
+        <radialGradient id="${p}o1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".7"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${p}o2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${tl}" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="${tl}" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="${p}wave" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="${a2}" stop-opacity=".42"/>
+        </linearGradient>
+        <filter id="${p}gf"><feGaussianBlur stdDeviation="18"/></filter>
+        <clipPath id="${p}cl"><rect width="320" height="180"/></clipPath>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- orbes de luz subaquática -->
+      <ellipse cx="40" cy="50" rx="130" ry="110" fill="url(#${p}o1)" filter="url(#${p}gf)"/>
+      <ellipse cx="290" cy="150" rx="120" ry="100" fill="url(#${p}o2)" filter="url(#${p}gf)"/>
+      <!-- camadas de onda -->
+      <g clip-path="url(#${p}cl)">
+        <rect x="-10" y="98" width="340" height="28" fill="${a1}" fill-opacity=".22" rx="4"/>
+        <rect x="-10" y="112" width="340" height="24" fill="${tl}" fill-opacity=".18" rx="3"/>
+        <rect x="-10" y="128" width="340" height="28" fill="${a2}" fill-opacity=".20" rx="3"/>
+        <rect x="-10" y="148" width="340" height="40" fill="${bg2}" fill-opacity=".55"/>
+        <!-- cristas de onda (linhas brancas finas) -->
+        <rect x="0" y="98" width="320" height="1.5" fill="#ffffff" opacity=".18"/>
+        <rect x="0" y="112" width="320" height="1.5" fill="#ffffff" opacity=".14"/>
+        <rect x="0" y="128" width="320" height="1.5" fill="#ffffff" opacity=".12"/>
+        <!-- luz refratada (raios verticais) -->
+        <rect x="55" y="0" width="6" height="100" fill="#ffffff" opacity=".06"/>
+        <rect x="120" y="0" width="4" height="95" fill="#ffffff" opacity=".05"/>
+        <rect x="190" y="0" width="5" height="98" fill="#ffffff" opacity=".05"/>
+        <!-- conteúdo -->
+        ${_T(18,28,200,14,txt,.9)}
+        <rect x="18" y="50" width="60" height="1.5" fill="${a1}" opacity=".8"/>
+        <rect x="82" y="50" width="36" height="1.5" fill="${tl}" opacity=".7"/>
+        ${_TB(18,58,160,txt,3,5,9,.45)}
+      </g>
+    </svg>`;
+
+    /* ═══════════════════════════════════════════════
+       MESH — blobs orgânicos, gradient field, editorial
+    ═══════════════════════════════════════════════ */
+    case 'mesh': return `${open}
+      <defs>
+        <radialGradient id="${p}b1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity=".72"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${p}b2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a2}" stop-opacity=".65"/>
+          <stop offset="100%" stop-color="${a2}" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="${p}b3" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${tl}" stop-opacity=".58"/>
+          <stop offset="100%" stop-color="${tl}" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${p}gf"><feGaussianBlur stdDeviation="22"/></filter>
+        <filter id="${p}gf2"><feGaussianBlur stdDeviation="8"/></filter>
+        <clipPath id="${p}cl"><rect width="320" height="180"/></clipPath>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <g clip-path="url(#${p}cl)">
+        <!-- blobs de cor -->
+        <ellipse cx="55" cy="48" rx="155" ry="130" fill="url(#${p}b1)" filter="url(#${p}gf)"/>
+        <ellipse cx="275" cy="138" rx="145" ry="120" fill="url(#${p}b2)" filter="url(#${p}gf)"/>
+        <ellipse cx="165" cy="20" rx="100" ry="90" fill="url(#${p}b3)" filter="url(#${p}gf)"/>
+        <!-- véu de legibilidade -->
+        <rect width="320" height="180" fill="${bg}" opacity=".45"/>
+        <!-- card de leitura translúcido -->
+        <rect x="12" y="18" width="200" height="146" fill="${bg2}" fill-opacity=".48" rx="6"/>
+        <rect x="12" y="18" width="200" height="2" fill="#ffffff" opacity=".18" rx="1"/>
+        <rect x="12" y="18" width="4" height="146" fill="${a1}" opacity=".55" rx="2"/>
+        <!-- blob decorativo no card -->
+        <ellipse cx="160" cy="120" rx="80" ry="55" fill="${a2}" fill-opacity=".08" filter="url(#${p}gf2)"/>
+        <!-- conteúdo -->
+        ${_T(26,32,170,14,txt,.9)}
+        <ellipse cx="30" cy="56" rx="7" ry="7" fill="${a1}" opacity=".9"/>
+        <ellipse cx="26" cy="52" rx="11" ry="11" fill="${a1}" opacity=".3"/>
+        <rect x="44" y="54" width="120" height="1.8" fill="${a2}" opacity=".7"/>
+        ${_TB(26,68,155,txt,3,5,9,.45)}
+      </g>
+    </svg>`;
+
+    /* ═══════════════════════════════════════════════
+       VOID — preto absoluto, ponto cirúrgico, tipografia pura
+    ═══════════════════════════════════════════════ */
+    case 'void': return `${open}
+      <defs>
+        <radialGradient id="${p}pt" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${a1}" stop-opacity="1"/>
+          <stop offset="100%" stop-color="${a1}" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="320" height="180" fill="${bg}"/>
+      <!-- ponto cirúrgico único -->
+      <ellipse cx="22" cy="22" rx="12" ry="12" fill="url(#${p}pt)" opacity=".5"/>
+      <ellipse cx="22" cy="22" rx="5" ry="5" fill="${a1}" opacity="1"/>
+      <!-- linha horizontal cirúrgica -->
+      <rect x="18" y="72" width="230" height="1.5" fill="${a1}" opacity=".9"/>
+      <!-- título — peso tipográfico absoluto -->
+      <text x="18" y="102" font-size="28" fill="${txt}" font-family="'Calibri Light','Arial',sans-serif" font-weight="300" opacity=".95">Título</text>
+      <!-- subtítulo esmaecido -->
+      ${_T(18,120,160,7,txt,.28)}
+      ${_T(18,133,110,5,txt,.16)}
+      <!-- data — acento da cor única -->
+      <text x="302" y="170" font-size="8" fill="${a1}" font-family="'Calibri Light','Arial',sans-serif" text-anchor="end" opacity=".85">2026</text>
     </svg>`;
 
     default: return `${open}<rect width="320" height="180" fill="${bg}"/>
