@@ -515,6 +515,25 @@
         .btn-pill{border-radius:100px}
         .btn:disabled{opacity:.25;cursor:not-allowed;transform:none!important;filter:none!important}
 
+        /* ── Botão PDF ── */
+        .btn-pdf{
+            width:100%;padding:1rem 1.5rem;
+            border-radius:var(--radius);
+            background:var(--bg3);
+            border:1px solid var(--border2);
+            color:var(--text);
+            font-family:'DM Mono',monospace;font-size:.72rem;font-weight:500;
+            letter-spacing:.12em;text-transform:uppercase;
+            cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;
+            transition:all .2s var(--ease);
+            position:relative;overflow:hidden;
+        }
+        .btn-pdf:hover{
+            background:var(--bg4);border-color:var(--a1);
+            box-shadow:0 0 0 1px var(--a1)22;
+        }
+        .btn-pdf:disabled{ opacity:.5;cursor:not-allowed; }
+
         .btn-generate{
             padding:1rem 2.5rem;font-size:.82rem;font-weight:700;
             border-radius:var(--r);letter-spacing:.14em;text-transform:uppercase;
@@ -1445,10 +1464,14 @@
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:.25rem"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                         Gerar apresentação PPTX
                     </button>
+                    <button class="btn-pdf" id="btnExportPdf" onclick="exportPDF()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h4M7 12h10M7 17h10"/></svg>
+                        Exportar PDF
+                        <span style="font-size:.62rem;opacity:.5;margin-left:.25rem">(html2canvas)</span>
+                    </button>
                     <button class="btn btn-secondary" style="justify-content:center" onclick="saveDraft()">
                         Salvar rascunho JSON
                     </button>
-                    <div style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.25rem">Para PDF: abra o PPTX no PowerPoint → Exportar → PDF</div>
                 </div>
 
                 <div class="step-footer">
@@ -1558,6 +1581,9 @@
     <div class="preview-total" id="sheetTotal"></div>
 </div>
 
+<!-- Zona de render off-screen para html2canvas (pdf.js) -->
+<div id="pdfRenderZone" style="position:fixed;left:-9999px;top:0;width:1280px;height:720px;overflow:hidden;pointer-events:none;z-index:-100"></div>
+
 <div id="toastWrap"></div>
 
 <!-- Scripts carregados na ordem correta -->
@@ -1578,5 +1604,6 @@
 <script src="js/models/index.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>
+<script src="js/pdf.js"></script>
 </body>
 </html>
