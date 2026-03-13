@@ -37,7 +37,7 @@ function updateModeUI() {
 // ════════════════════════════════════════════════════
 // NAVEGAÇÃO DE STEPS
 // ════════════════════════════════════════════════════
-const STEPS = ['identity','blocks','theme','projects','generate'];
+const STEPS = ['identity','blocks','modelo','theme','projects','generate'];
 
 function goStep(step) {
   G.step = step;
@@ -55,6 +55,7 @@ function goStep(step) {
   });
 
   if(step==='generate') { renderGenSummary(); renderSlideList(); }
+  if(step==='modelo')   { renderModeloGrid(); }
   refreshPreview();
 }
 
