@@ -119,6 +119,7 @@ function refreshPreview() {
   if(!T) return;
   const C = T.C;
 
+  // ── slide mini (capa) ──
   const bg = document.getElementById('slideBg');
   if(bg) bg.style.background = `#${C.bg}`;
 
@@ -135,6 +136,25 @@ function refreshPreview() {
   const slides = countSlides();
   const cnt = document.getElementById('slideCount');
   if(cnt) cnt.textContent = `${slides} slide${slides!==1?'s':''}`;
+
+  // ── thumbnail do modelo ──
+  const thumb = document.getElementById('previewThumb');
+  if(thumb && typeof svgModelThumb === 'function') {
+    thumb.innerHTML = svgModelThumb(G.modelo, C);
+  }
+  const thumbLabel = document.getElementById('previewThumbLabel');
+  if(thumbLabel) {
+    const m = MODELOS_META?.[G.modelo];
+    thumbLabel.textContent = m ? m.name : G.modelo;
+  }
+
+  // ── pills modelo / tema ──
+  const modeloName = document.getElementById('previewModeloName');
+  if(modeloName) {
+    modeloName.textContent = MODELOS_META?.[G.modelo]?.name || G.modelo;
+  }
+  const themeName = document.getElementById('previewThemeName');
+  if(themeName) themeName.textContent = T.name || G.theme;
 
   renderPreviewBlocks();
 }
