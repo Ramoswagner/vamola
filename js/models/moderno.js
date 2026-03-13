@@ -125,8 +125,8 @@ class ModeloModerno extends ModeloBase {
         }
 
         const dt = [];
-        if (projeto.periodo_inicio) dt.push(new Date(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
-        if (projeto.periodo_fim)    dt.push(new Date(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_inicio) dt.push(ModeloBase.parseDate(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_fim)    dt.push(ModeloBase.parseDate(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
         if (dt.length) {
             s.addText(dt.join(' → '), { x: 1.0, y: 5.38, w: 8, h: 0.3, fontSize: 10, color: projeto.color || C.a2, fontFace: 'Calibri', bold: true });
         }
