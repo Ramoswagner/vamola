@@ -191,7 +191,7 @@ function addProject() {
     riscos:[{texto:''}], licoes:[{texto:''}],
     antesdepois:{antes_titulo:'',antes_desc:'',antes_img:null,depois_titulo:'',depois_desc:'',depois_img:null},
     evidencias:[null,null,null,null],
-    desafios:'',
+    desafios:{ continuidade:'', acompanhamento:'', desdobramentos:'' },
     bi2025:null, bi2026:null,
   });
   if(!G.activeProjectId) G.activeProjectId = id;
@@ -382,8 +382,16 @@ function buildForm(p) {
   `)}
 
   ${accord(p,'desafios','Desafios Futuros',B.desafios?.enabled,`
-    <div class="field"><label>Continuidade, acompanhamento e desdobramentos estratégicos</label>
-      <textarea rows="4" oninput="pset('${p.id}','desafios',this.value)">${esc(p.desafios)}</textarea>
+    <div class="frow c1">
+      <div class="field"><label>Continuidade — como o projeto segue vivo?</label>
+        <textarea rows="3" placeholder="Descreva ações de manutenção, responsáveis pela continuidade..." oninput="psetD('${p.id}','desafios','continuidade',this.value)">${esc(p.desafios.continuidade)}</textarea>
+      </div>
+      <div class="field"><label>Acompanhamento — como os resultados serão monitorados?</label>
+        <textarea rows="3" placeholder="Indicadores a acompanhar, cadência de revisão, fórum de governança..." oninput="psetD('${p.id}','desafios','acompanhamento',this.value)">${esc(p.desafios.acompanhamento)}</textarea>
+      </div>
+      <div class="field"><label>Desdobramentos — próximos passos estratégicos</label>
+        <textarea rows="3" placeholder="Projetos derivados, expansão de escopo, novos públicos ou áreas..." oninput="psetD('${p.id}','desafios','desdobramentos',this.value)">${esc(p.desafios.desdobramentos)}</textarea>
+      </div>
     </div>
   `)}
 
