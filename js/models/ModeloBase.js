@@ -540,16 +540,17 @@ class ModeloBase {
         s.addText('Próximos Passos', { x: 0.35, y: 0.52, w: 9.3, h: 0.55, fontSize: 22, color: C.txt, fontFace: 'Calibri', bold: true });
 
         [
-            { label: 'Continuidade',    icon: '↻' },
-            { label: 'Acompanhamento', icon: '◉' },
-            { label: 'Desdobramentos', icon: '→' }
+            { label: 'Continuidade',    icon: '↻', key: 'continuidade'    },
+            { label: 'Acompanhamento', icon: '◉', key: 'acompanhamento'  },
+            { label: 'Desdobramentos', icon: '→', key: 'desdobramentos'  }
         ].forEach((a, i) => {
             const x = 0.35 + i * 3.2;
             s.addShape(pres.shapes.RECTANGLE, { x, y: 1.35, w: 3.05, h: 5.55, fill: { color: C.bg2 }, line: { width: 0 } });
             s.addShape(pres.shapes.RECTANGLE, { x, y: 1.35, w: 3.05, h: 0.04, fill: { color: C.a3 || C.a2 }, line: { width: 0 } });
             s.addText(a.icon,  { x: x + 0.2, y: 1.55, w: 0.5, h: 0.45, fontSize: 18, color: C.a3 || C.a2 });
             s.addText(a.label, { x: x + 0.2, y: 2.12, w: 2.65, h: 0.28, fontSize: 10, color: C.a3 || C.a2, fontFace: 'Calibri', bold: true });
-            s.addText(projeto.desafios || '[ A preencher ]', { x: x + 0.2, y: 2.52, w: 2.65, h: 4.2, fontSize: 9, color: C.muted, fontFace: 'Calibri Light', lineSpacingMultiple: 1.45 });
+            const conteudo = (projeto.desafios && projeto.desafios[a.key]) || '[ A preencher ]';
+            s.addText(conteudo, { x: x + 0.2, y: 2.52, w: 2.65, h: 4.2, fontSize: 9, color: C.muted, fontFace: 'Calibri Light', lineSpacingMultiple: 1.45 });
         });
 
         this._adicionarRodape(s, pres, G, C, projeto.name);
