@@ -8,6 +8,17 @@ class ModeloBase {
     static W = 13.33;
     static H = 7.5;
 
+    /**
+     * Converte string de data "YYYY-MM-DD" (vinda de <input type="date">)
+     * para Date no horário local, evitando o problema de UTC midnight
+     * que causa exibição do dia anterior em fusos negativos (ex: BRT = UTC-3).
+     * @param {string} str
+     * @returns {Date}
+     */
+    static parseDate(str) {
+        return new Date(str + 'T12:00:00');
+    }
+
     constructor(nome) {
         this.nome = nome;
     }
@@ -212,8 +223,8 @@ class ModeloBase {
         }
 
         const dt = [];
-        if (projeto.periodo_inicio) dt.push(new Date(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
-        if (projeto.periodo_fim)    dt.push(new Date(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_inicio) dt.push(ModeloBase.parseDate(projeto.periodo_inicio).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
+        if (projeto.periodo_fim)    dt.push(ModeloBase.parseDate(projeto.periodo_fim).toLocaleDateString('pt-BR',    { month: 'short', year: 'numeric' }));
         if (dt.length) {
             s.addText(dt.join(' → '), { x: 1.2, y: 5.4, w: 8, h: 0.3, fontSize: 10, color: projeto.color || C.a2, fontFace: 'Calibri', bold: true });
         }
@@ -341,7 +352,7 @@ class ModeloBase {
             s.addShape(pres.shapes.RECTANGLE, { x: x - 0.05, y: 3.22, w: 0.1, h: 0.2, fill: { color: projeto.color || C.a1 }, line: { width: 0 } });
             s.addShape(pres.shapes.RECTANGLE, { x: x - 0.015, y: above ? 1.9 : 3.45, w: 0.03, h: 1.32, fill: { color: C.a1, transparency: 75 }, line: { width: 0 } });
             if (m.data) {
-                const dataStr = new Date(m.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                const dataStr = ModeloBase.parseDate(m.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
                 s.addText(dataStr, { x: x - 1, y: above ? 1.62 : 4.85, w: 2, h: 0.25, align: 'center', fontSize: 8, color: projeto.color || C.a2, fontFace: 'Calibri', bold: true });
             }
             s.addText(m.entrega, { x: x - 1.5, y: above ? 1.0 : 4.95, w: 3, h: 0.52, align: 'center', fontSize: 9.5, color: C.txt, fontFace: 'Calibri Light', lineSpacingMultiple: 1.2 });
