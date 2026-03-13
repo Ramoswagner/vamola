@@ -9,6 +9,7 @@ function init() {
   addProject();
   renderBlockGrid();
   renderThemeGrid();
+  renderModeloGrid();
   renderPreviewBlocks();
   refreshPreview();
   selectModelo('classico');
@@ -25,9 +26,13 @@ function selectMode(mode) {
 
 function selectModelo(modelo) {
   G.modelo = modelo;
+  // Atualiza grid de cards (passo 2)
+  renderModeloGrid();
+  // Compatibilidade retroativa com botões da splash
   document.querySelectorAll('.modelo-btn').forEach(btn => btn.classList.remove('selected'));
   document.getElementById('modeloBtn-' + modelo)?.classList.add('selected');
-  toast(`Modelo "${modelo}" selecionado`, 'info');
+  const nome = MODELOS_META?.[modelo]?.name || modelo;
+  toast(`Modelo "${nome}" selecionado`, 'info');
 }
 
 // ════════════════════════════════════════════════════
