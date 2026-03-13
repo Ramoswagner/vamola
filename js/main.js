@@ -856,372 +856,135 @@ function saveDraft(){
 // ════════════════════════════════════════════════════
 // PPTX GENERATOR
 // ════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+// PPTX GENERATOR (REFATORADO PARA USAR MODELOS)
+// ════════════════════════════════════════════════════
 async function generatePptx() {
-  const T=THEMES[G.theme];const C=T.C;
-  setProgress(true,5,'Iniciando...');
+  const T = THEMES[G.theme];
+  if (!T) return toast('Tema não encontrado', 'err');
+  const C = T.C;
+  
+  // Obtém o modelo ativo
+  const modelo = modelos[G.modelo];
+  if (!modelo) return toast('Modelo não encontrado', 'err');
 
-  const pres=new PptxGenJS();
-  pres.layout='LAYOUT_WIDE';
-  const W=13.33,H=7.5;
-  const total=countSlides();
-  let done=0;
-  const tick=async(msg)=>{ done++; setProgress(true,Math.round(done/total*90)+5,msg); await new Promise(r=>requestAnimationFrame(r)); };
+  setProgress(true, 5, 'Iniciando...');
 
-  // HELPER FUNS
-  const base=()=>{
-    const s=pres.addSlide();
-    s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:C.bg}});
-    return s;
-  };
-  const footer=(s,projName)=>{
-    s.addShape(pres.shapes.RECTANGLE,{x:0,y:H-.35,w:W,h:.35,fill:{color:C.bg2},line:{width:0}});
-    if(G.id.instName) s.addText(G.id.instName,{x:.3,y:H-.28,w:5,h:.22,fontSize:7,color:C.muted,fontFace:'Calibri Light',margin:0});
-    if(projName) s.addText(projName,{x:W/2-2,y:H-.28,w:4,h:.22,fontSize:7,color:C.muted,fontFace:'Calibri Light',align:'center',margin:0});
-    if(G.id.presDate) s.addText(G.id.presDate,{x:W-3.3,y:H-.28,w:3,h:.22,fontSize:7,color:C.muted,fontFace:'Calibri Light',align:'right',margin:0});
-  };
-  const tag=(s,text,x,y)=>{
-    s.addShape(pres.shapes.RECTANGLE,{x,y,w:text.length*.09+.3,h:.22,fill:{color:C.a1}});
-    s.addText(text,{x:x+.08,y:y+.02,w:text.length*.09+.2,h:.18,fontSize:6.5,color:'FFFFFF',fontFace:'Calibri',bold:true,charSpacing:1.5,margin:0});
+  const pres = new PptxGenJS();
+  pres.layout = 'LAYOUT_WIDE';
+  const total = countSlides();
+  let done = 0;
+  const tick = async (msg) => {
+    done++;
+    setProgress(true, Math.round(done / total * 90) + 5, msg);
+    await new Promise(r => requestAnimationFrame(r));
   };
 
-  // CAPA
+  // --- Capa ---
   await tick('Capa...');
-  {
-    const s=base();
-    // diagonal accent block
-    s.addShape(pres.shapes.RECTANGLE,{x:W*.55,y:0,w:W*.45,h:H,fill:{color:C.bg2},line:{width:0}});
-    s.addShape(pres.shapes.RECTANGLE,{x:0,y:H-1.2,w:W*.55,h:.04,fill:{color:C.a1},line:{width:0}});
-    s.addShape(pres.shapes.RECTANGLE,{x:0,y:H-1.2,w:2.5,h:.04,fill:{color:C.a2},line:{width:0}});
-    // eyebrow
-    if(G.id.instDept) s.addText(G.id.instDept.toUpperCase(),{x:.55,y:1.6,w:6,h:.28,fontSize:8,color:C.muted,fontFace:'Calibri Light',charSpacing:2.5,margin:0});
-    // title
-    s.addText(G.id.presTitle||'Apresentação',{x:.55,y:2.0,w:6.5,h:2.5,fontSize:44,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:.9,margin:0});
-    // subtitle
-    if(G.id.presSub) s.addText(G.id.presSub,{x:.55,y:4.6,w:6.5,h:.6,fontSize:14,color:C.muted,fontFace:'Calibri Light',margin:0});
-    // meta
-    if(G.id.instName) s.addText(G.id.instName,{x:.55,y:H-1.0,w:5,h:.28,fontSize:10,color:C.txt,fontFace:'Calibri',bold:false,margin:0});
-    if(G.id.presDate) s.addText(G.id.presDate,{x:.55,y:H-.7,w:5,h:.22,fontSize:9,color:C.muted,fontFace:'Calibri Light',margin:0});
-    // portfolio list
-    if(G.mode!=='single') {
-      G.projects.forEach((p,i)=>{
-        const y=2.2+i*.38;
-        s.addShape(pres.shapes.RECTANGLE,{x:W*.57,y:y,w:.05,h:.25,fill:{color:p.color||C.a1},line:{width:0}});
-        s.addText(p.name||'Projeto',{x:W*.58,y:y,w:4.8,h:.28,fontSize:12,color:C.txt,fontFace:'Calibri',bold:false,margin:0});
-      });
-    }
-    // logos
-    if(G.id.logoInst) s.addImage({data:G.id.logoInst,x:W*.57,y:.5,w:2,h:1,sizing:{type:'contain',w:2,h:1}});
-    if(G.id.logoProg) s.addImage({data:G.id.logoProg,x:W*.81,y:.5,w:2,h:1,sizing:{type:'contain',w:2,h:1}});
-  }
+  modelo.gerarCapa(pres, G, C);
 
-  // SUMARIO
-  if(G.mode!=='single'){
+  // --- Sumário (se não for single) ---
+  if (G.mode !== 'single') {
     await tick('Sumário...');
-    const s=base();
-    tag(s,'SUMÁRIO',.55,.35);
-    s.addText('Projetos nesta apresentação',{x:.55,y:.55,w:8,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-    G.projects.forEach((p,i)=>{
-      const x=.55+(i%2)*6.1,y=1.5+Math.floor(i/2)*.95;
-      s.addShape(pres.shapes.RECTANGLE,{x,y,w:5.9,h:.82,fill:{color:C.bg2},line:{color:C.bg2,width:.5}});
-      s.addShape(pres.shapes.RECTANGLE,{x,y,w:.04,h:.82,fill:{color:p.color||C.a1},line:{width:0}});
-      s.addText(String(i+1).padStart(2,'0'),{x:x+.15,y:y+.12,w:.55,h:.55,fontSize:26,color:p.color||C.a1,fontFace:'Calibri',bold:true,margin:0});
-      s.addText(p.name||'Projeto',{x:x+.85,y:y+.12,w:4.85,h:.3,fontSize:12,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      if(p.leader) s.addText(p.leader,{x:x+.85,y:y+.5,w:4.85,h:.22,fontSize:9,color:C.muted,fontFace:'Calibri Light',margin:0});
-    });
-    footer(s,'');
+    modelo.gerarSumario(pres, G, C);
   }
 
-  // PANORAMA
-  if(G.blocks.panorama?.enabled){
+  // --- Panorama (se ativo) ---
+  if (G.blocks.panorama?.enabled) {
     await tick('Panorama BI...');
-    const s=base();
-    tag(s,'PANORAMA',.55,.35);
-    s.addText('Contexto de Dados',{x:.55,y:.55,w:8,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-    const sides=[{key:'bi2025',label:'ANO ANTERIOR'},{key:'bi2026',label:'ANO ATUAL'}];
-    sides.forEach((sd,i)=>{
-      const x=.55+i*6.3;
-      if(G.id[sd.key]) s.addImage({data:G.id[sd.key],x,y:1.4,w:6,h:5.55,sizing:{type:'contain',w:6,h:5.55}});
-      else {
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.4,w:6,h:5.55,fill:{color:C.bg2},line:{color:C.bg2,width:.5}});
-        s.addText(`[ ${sd.label} ]`,{x,y:3.9,w:6,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});
-      }
-    });
-    footer(s,'');
+    modelo.gerarPanorama(pres, G, C);
   }
 
-  // PER PROJECT
-  for(let pi=0;pi<G.projects.length;pi++){
-    const p=G.projects[pi];
-    const B=G.blocks;
+  // --- Para cada projeto ---
+  for (let pi = 0; pi < G.projects.length; pi++) {
+    const p = G.projects[pi];
+    const B = G.blocks;
 
-    // DIVISOR
-    await tick(`Divisor ${p.name||pi+1}...`);
-    {
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:C.bg2}});
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.08,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:H-1.5,w:W,h:.04,fill:{color:p.color||C.a1},line:{width:0}});
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:H-1.5,w:2,h:.04,fill:{color:C.bg},line:{width:0}});
-      s.addText(`${String(pi+1).padStart(2,'0')}`,{x:1.2,y:1.2,w:4,h:3,fontSize:140,color:C.bg3||C.bg,fontFace:'Calibri',bold:true,margin:0,transparency:95});
-      s.addText(G.mode==='single'?'PROJETO':`PROJETO ${String(pi+1).padStart(2,'0')}`,{x:1.2,y:2.0,w:9,h:.28,fontSize:9,color:C.muted,fontFace:'Calibri Light',charSpacing:3,margin:0});
-      s.addText(p.name||'Projeto',{x:1.2,y:2.3,w:9,h:2.2,fontSize:46,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:.9,margin:0});
-      if(p.leader) s.addText(p.leader,{x:1.2,y:5.0,w:8,h:.32,fontSize:14,color:C.muted,fontFace:'Calibri Light',margin:0});
-      const dt=[];
-      if(p.periodo_inicio) dt.push(new Date(p.periodo_inicio).toLocaleDateString('pt-BR',{month:'short',year:'numeric'}));
-      if(p.periodo_fim) dt.push(new Date(p.periodo_fim).toLocaleDateString('pt-BR',{month:'short',year:'numeric'}));
-      if(dt.length) s.addText(dt.join(' → '),{x:1.2,y:5.4,w:8,h:.3,fontSize:10,color:p.color||C.a2,fontFace:'Calibri',bold:true,margin:0});
-      s.addShape(pres.shapes.RECTANGLE,{x:W-1.8,y:.5,w:1.35,h:.35,fill:{color:p.status==='Concluído'?C.teal||C.a2:C.gold,transparency:85}});
-      s.addText(p.status,{x:W-1.8,y:.52,w:1.35,h:.3,align:'center',fontSize:8,color:p.status==='Concluído'?C.teal||C.a2:C.gold,fontFace:'Calibri',bold:true,margin:0});
+    // Divisor do projeto
+    await tick(`Divisor ${p.name || pi + 1}...`);
+    modelo.gerarDivisor(pres, p, C, pi);
+
+    // Objetivo
+    if (B.objetivo?.enabled) {
+      await tick(`Objetivo ${p.name || pi + 1}...`);
+      modelo.gerarObjetivo(pres, p, C);
     }
 
-    // OBJETIVO
-    if(B.objetivo?.enabled){
-      await tick(`Objetivo ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      tag(s,'OBJETIVO',.35,.3);
-      s.addText('Problema & Oportunidade',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      if(p.objetivo){
-        s.addShape(pres.shapes.RECTANGLE,{x:.35,y:1.35,w:9.3,h:4.9,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x:.35,y:1.35,w:.04,h:4.9,fill:{color:p.color||C.a1},line:{width:0}});
-        s.addText(p.objetivo,{x:.6,y:1.55,w:8.9,h:4.5,fontSize:14,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.5,margin:0});
-      }
-      footer(s,p.name);
+    // Equipe
+    if (B.team?.enabled) {
+      await tick(`Equipe ${p.name || pi + 1}...`);
+      modelo.gerarEquipe(pres, p, C);
     }
 
-    // EQUIPE
-    if(B.team?.enabled){
-      await tick(`Equipe ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      tag(s,'EQUIPE',.35,.3);
-      s.addText('Quem realizou',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const team=p.team.filter(t=>t.nome);
-      team.forEach((t,i)=>{
-        const cols=Math.min(team.length,4);
-        const bw=(9.3/cols)-.15;
-        const x=.35+i*(bw+.15);
-        if(i>=4)return;
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw,h:3.9,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw,h:.04,fill:{color:p.color||C.a1},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x:x+bw/2-.35,y:1.6,w:.7,h:.7,fill:{color:p.color||C.a1,transparency:80}});
-        s.addText(t.nome.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(),{x:x+bw/2-.35,y:1.62,w:.7,h:.65,align:'center',fontSize:16,color:p.color||C.a1,fontFace:'Calibri',bold:true,margin:0});
-        s.addText(t.nome,{x:x+.1,y:2.5,w:bw-.2,h:.6,align:'center',fontSize:11,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:1,margin:0});
-        s.addText(t.cargo,{x:x+.1,y:3.2,w:bw-.2,h:.7,align:'center',fontSize:9,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
-      });
-      footer(s,p.name);
+    // Etapas
+    if (B.etapas?.enabled) {
+      await tick(`Etapas ${p.name || pi + 1}...`);
+      modelo.gerarEtapas(pres, p, C);
     }
 
-    // ETAPAS
-    if(B.etapas?.enabled){
-      await tick(`Etapas ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      tag(s,'ETAPAS',.35,.3);
-      s.addText('Jornada de Execução',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const etapas=p.etapas.filter(e=>e.titulo);
-      const n=Math.min(etapas.length,6);
-      const bw=9.3/n-.12;
-      etapas.slice(0,n).forEach((e,i)=>{
-        const x=.35+i*(bw+.12);
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw,h:4.9,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw,h:.04,fill:{color:p.color||C.a1,transparency:i*15},line:{width:0}});
-        s.addText(String(i+1).padStart(2,'0'),{x:x+.12,y:1.5,w:1,h:.55,fontSize:26,color:p.color||C.a1,fontFace:'Calibri',bold:true,margin:0,transparency:40});
-        s.addText(e.titulo,{x:x+.12,y:2.15,w:bw-.24,h:.55,fontSize:12,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:1.1,margin:0});
-        if(e.descricao) s.addText(e.descricao,{x:x+.12,y:2.82,w:bw-.24,h:3.2,fontSize:9,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.35,margin:0});
-      });
-      footer(s,p.name);
+    // Marcos
+    if (B.marcos?.enabled) {
+      await tick(`Marcos ${p.name || pi + 1}...`);
+      modelo.gerarMarcos(pres, p, C);
     }
 
-    // MARCOS
-    if(B.marcos?.enabled){
-      await tick(`Marcos ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      tag(s,'MARCOS',.35,.3);
-      s.addText('Timeline do Projeto',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const marcos=p.marcos.filter(m=>m.entrega);
-      // timeline line
-      s.addShape(pres.shapes.RECTANGLE,{x:.55,y:3.3,w:9.0,h:.03,fill:{color:C.a1,transparency:60},line:{width:0}});
-      const n2=Math.min(marcos.length,6);
-      marcos.slice(0,n2).forEach((m,i)=>{
-        const x=.55+i*(9.0/(n2>1?n2-1:1));
-        const above=i%2===0;
-        s.addShape(pres.shapes.RECTANGLE,{x:x-.05,y:3.22,w:.1,h:.2,fill:{color:p.color||C.a1},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x:x-.015,y:above?1.9:3.45,w:.03,h:above?1.32:1.32,fill:{color:C.a1,transparency:75},line:{width:0}});
-        if(m.data) s.addText(new Date(m.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}),{x:x-1,y:above?1.62:4.85,w:2,h:.25,align:'center',fontSize:8,color:p.color||C.a2,fontFace:'Calibri',bold:true,margin:0});
-        s.addText(m.entrega,{x:x-1.5,y:above?1.0:4.95,w:3,h:.52,align:'center',fontSize:9.5,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.2,margin:0});
-      });
-      footer(s,p.name);
+    // Indicadores
+    if (B.indicadores?.enabled) {
+      await tick(`Indicadores ${p.name || pi + 1}...`);
+      modelo.gerarIndicadores(pres, p, C);
     }
 
-    // INDICADORES
-    if(B.indicadores?.enabled){
-      await tick(`KPIs ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      tag(s,'INDICADORES',.35,.3);
-      s.addText('KPIs do Projeto',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const inds=p.indicadores.filter(i=>i.nome);
-      const n3=Math.min(inds.length,4);
-      const bw2=9.3/n3-.15;
-      inds.slice(0,n3).forEach((ind,i)=>{
-        const x=.35+i*(bw2+.15);
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw2,h:4.9,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw2,h:.04,fill:{color:p.color||C.a1},line:{width:0}});
-        s.addText(ind.realizado||'–',{x:x+.15,y:1.55,w:bw2-.3,h:1.2,fontSize:46,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:.85,margin:0});
-        s.addShape(pres.shapes.RECTANGLE,{x:x+.15,y:2.85,w:bw2-.3,h:.04,fill:{color:C.a1,transparency:70},line:{width:0}});
-        if(ind.meta) s.addText(`Meta: ${ind.meta}`,{x:x+.15,y:2.95,w:bw2-.3,h:.28,fontSize:9,color:C.muted,fontFace:'Calibri Light',margin:0});
-        s.addText(ind.nome,{x:x+.15,y:3.3,w:bw2-.3,h:2.7,fontSize:10.5,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
-      });
-      footer(s,p.name);
+    // Resultados
+    if (B.resultados?.enabled) {
+      await tick(`Resultados ${p.name || pi + 1}...`);
+      modelo.gerarResultados(pres, p, C);
     }
 
-    // RESULTADOS
-    if(B.resultados?.enabled){
-      await tick(`Resultados ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      tag(s,'RESULTADOS',.35,.3);
-      s.addText('Impacto Realizado',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const res=p.resultados.filter(r=>r.metrica);
-      const n4=Math.min(res.length,4);
-      const bw3=9.3/n4-.15;
-      res.slice(0,n4).forEach((r,i)=>{
-        const x=.35+i*(bw3+.15);
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw3,h:4.9,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:bw3,h:.04,fill:{color:p.color||C.a1},line:{width:0}});
-        s.addText(r.absoluto||'–',{x:x+.15,y:1.55,w:bw3-.3,h:1.1,fontSize:40,color:C.txt,fontFace:'Calibri',bold:true,lineSpacingMultiple:.85,margin:0});
-        if(r.percentual) s.addText(r.percentual,{x:x+.15,y:2.72,w:bw3-.3,h:.32,fontSize:14,color:p.color||C.a2,fontFace:'Calibri',bold:true,margin:0});
-        s.addText(r.metrica,{x:x+.15,y:3.15,w:bw3-.3,h:2.95,fontSize:9.5,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.35,margin:0});
-      });
-      footer(s,p.name);
+    // Antes & Depois
+    if (B.antesdepois?.enabled) {
+      await tick(`Antes/Depois ${p.name || pi + 1}...`);
+      modelo.gerarAntesDepois(pres, p, C);
     }
 
-    // ANTES DEPOIS
-    if(B.antesdepois?.enabled){
-      await tick(`Antes/Depois ${p.name||pi+1}...`);
-      const s=base();
-      const ba=p.antesdepois;
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.a2},line:{width:0}});
-      tag(s,'ANTES & DEPOIS',.35,.3);
-      s.addText('Evidências de Mudança',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      [[{key:'antes',lbl:'← ANTES',col:C.danger},{key:'depois',lbl:'→ DEPOIS',col:C.teal||C.a2}]].flat().forEach((sd,i)=>{
-        const x=.35+i*4.85;
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:4.6,h:5.55,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:4.6,h:.28,fill:{color:sd.col,transparency:80},line:{width:0}});
-        s.addText(sd.lbl,{x:x+.15,y:1.37,w:4.3,h:.23,fontSize:9,color:sd.col,fontFace:'Calibri',bold:true,charSpacing:1.2,margin:0});
-        const img=ba[sd.key+'_img'];
-        if(img) s.addImage({data:img,x:x+.1,y:1.68,w:4.4,h:2.0,sizing:{type:'cover',w:4.4,h:2.0}});
-        else {
-          s.addShape(pres.shapes.RECTANGLE,{x:x+.1,y:1.68,w:4.4,h:2.0,fill:{color:C.bg,transparency:30},line:{width:0}});
-          s.addText('[ Inserir foto ]',{x:x+.1,y:2.6,w:4.4,h:.3,align:'center',fontSize:9,color:C.muted,fontFace:'Calibri Light',margin:0});
-        }
-        const tit=ba[sd.key+'_titulo'];const desc=ba[sd.key+'_desc'];
-        if(tit) s.addText(tit,{x:x+.15,y:3.82,w:4.3,h:.3,fontSize:11,color:sd.col,fontFace:'Calibri',bold:true,margin:0});
-        if(desc) s.addText(desc,{x:x+.15,y:4.2,w:4.3,h:2.5,fontSize:9,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
-      });
-      footer(s,p.name);
+    // Evidências
+    if (B.evidencias?.enabled) {
+      await tick(`Evidências ${p.name || pi + 1}...`);
+      modelo.gerarEvidencias(pres, p, C);
     }
 
-    // EVIDÊNCIAS
-    if(B.evidencias?.enabled){
-      await tick(`Evidências ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:p.color||C.a1},line:{width:0}});
-      tag(s,'EVIDÊNCIAS',.35,.3);
-      s.addText('Registros do Projeto',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const imgs=p.evidencias.filter(Boolean);
-      if(!imgs.length){
-        s.addShape(pres.shapes.RECTANGLE,{x:.35,y:1.35,w:9.3,h:5.55,fill:{color:C.bg2},line:{width:0}});
-        s.addText('[ Evidências a inserir ]',{x:.35,y:3.9,w:9.3,h:.4,align:'center',fontSize:12,color:C.muted,fontFace:'Calibri Light',margin:0});
-      } else {
-        const n5=imgs.length;
-        if(n5===1) s.addImage({data:imgs[0],x:.35,y:1.35,w:9.3,h:5.55,sizing:{type:'cover',w:9.3,h:5.55}});
-        else if(n5===2) imgs.forEach((img,i)=>s.addImage({data:img,x:.35+i*4.85,y:1.35,w:4.6,h:5.55,sizing:{type:'cover',w:4.6,h:5.55}}));
-        else imgs.slice(0,4).forEach((img,i)=>s.addImage({data:img,x:.35+(i%2)*4.85,y:1.35+(Math.floor(i/2)*2.85),w:4.6,h:2.7,sizing:{type:'cover',w:4.6,h:2.7}}));
-      }
-      footer(s,p.name);
+    // Riscos
+    if (B.riscos?.enabled) {
+      await tick(`Riscos ${p.name || pi + 1}...`);
+      modelo.gerarRiscos(pres, p, C);
     }
 
-    // RISCOS
-    if(B.riscos?.enabled){
-      await tick(`Riscos ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.danger},line:{width:0}});
-      tag(s,'RISCOS & ATENÇÃO',.35,.3);
-      s.addText('Pontos de Atenção',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const riscos=p.riscos.filter(r=>r.texto);
-      riscos.forEach((r,i)=>{
-        if(i>=5)return;
-        const y=1.4+i*.98;
-        s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:9.3,h:.85,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:.04,h:.85,fill:{color:C.danger},line:{width:0}});
-        s.addText(String(i+1),{x:.52,y:y+.22,w:.3,h:.3,fontSize:12,color:C.danger,fontFace:'Calibri',bold:true,margin:0});
-        s.addText(r.texto,{x:.95,y:y+.1,w:8.5,h:.68,fontSize:11,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
-      });
-      footer(s,p.name);
+    // Lições
+    if (B.licoes?.enabled) {
+      await tick(`Lições ${p.name || pi + 1}...`);
+      modelo.gerarLicoes(pres, p, C);
     }
 
-    // LIÇÕES
-    if(B.licoes?.enabled){
-      await tick(`Lições ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.teal||C.a2},line:{width:0}});
-      tag(s,'LIÇÕES APRENDIDAS',.35,.3);
-      s.addText('O que aprendemos',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const licoes=p.licoes.filter(l=>l.texto);
-      licoes.forEach((l,i)=>{
-        if(i>=5)return;
-        const y=1.4+i*.98;
-        s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:9.3,h:.85,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x:.35,y,w:.04,h:.85,fill:{color:C.teal||C.a2},line:{width:0}});
-        s.addText(String(i+1),{x:.52,y:y+.22,w:.3,h:.3,fontSize:12,color:C.teal||C.a2,fontFace:'Calibri',bold:true,margin:0});
-        s.addText(l.texto,{x:.95,y:y+.1,w:8.5,h:.68,fontSize:11,color:C.txt,fontFace:'Calibri Light',lineSpacingMultiple:1.3,margin:0});
-      });
-      footer(s,p.name);
+    // Desafios
+    if (B.desafios?.enabled) {
+      await tick(`Desafios ${p.name || pi + 1}...`);
+      modelo.gerarDesafios(pres, p, C);
     }
+  }
 
-    // DESAFIOS
-    if(B.desafios?.enabled){
-      await tick(`Desafios ${p.name||pi+1}...`);
-      const s=base();
-      s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.06,h:H,fill:{color:C.a3||C.a2},line:{width:0}});
-      tag(s,'DESAFIOS FUTUROS',.35,.3);
-      s.addText('Próximos Passos',{x:.35,y:.52,w:9.3,h:.55,fontSize:22,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-      const areas=[{label:'Continuidade',icon:'↻'},{label:'Acompanhamento',icon:'◉'},{label:'Desdobramentos',icon:'→'}];
-      areas.forEach((a,i)=>{
-        const x=.35+i*3.2;
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:3.05,h:5.55,fill:{color:C.bg2},line:{width:0}});
-        s.addShape(pres.shapes.RECTANGLE,{x,y:1.35,w:3.05,h:.04,fill:{color:C.a3||C.a2},line:{width:0}});
-        s.addText(a.icon,{x:x+.2,y:1.55,w:.5,h:.45,fontSize:18,color:C.a3||C.a2,margin:0});
-        s.addText(a.label,{x:x+.2,y:2.12,w:2.65,h:.28,fontSize:10,color:C.a3||C.a2,fontFace:'Calibri',bold:true,margin:0});
-        s.addText(p.desafios||'[ A preencher ]',{x:x+.2,y:2.52,w:2.65,h:4.2,fontSize:9,color:C.muted,fontFace:'Calibri Light',lineSpacingMultiple:1.45,margin:0});
-      });
-      footer(s,p.name);
-    }
-  } // end for projects
-
-  // ENCERRAMENTO
-  if(G.blocks.encerramento?.enabled){
+  // --- Encerramento ---
+  if (G.blocks.encerramento?.enabled) {
     await tick('Encerramento...');
-    const s=pres.addSlide();
-    s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:C.bg}});
-    s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:.04,fill:{color:C.a1},line:{width:0}});
-    s.addShape(pres.shapes.RECTANGLE,{x:0,y:H-.04,w:W,h:.04,fill:{color:C.a2},line:{width:0}});
-    if(G.id.presTitle) s.addText(G.id.presTitle,{x:1,y:.65,w:W-2,h:.32,align:'center',fontSize:10,color:C.muted,fontFace:'Calibri Light',charSpacing:2.5,margin:0});
-    s.addText('Obrigado.',{x:1,y:1.1,w:W-2,h:2.5,align:'center',fontSize:80,color:C.txt,fontFace:'Calibri',bold:true,margin:0});
-    if(G.id.instName) s.addText(G.id.instName,{x:1,y:3.8,w:W-2,h:.35,align:'center',fontSize:14,color:C.muted,fontFace:'Calibri Light',margin:0});
-    if(G.id.presDate) s.addText(G.id.presDate,{x:1,y:4.2,w:W-2,h:.28,align:'center',fontSize:10,color:C.muted,fontFace:'Calibri Light',margin:0});
-    if(G.id.logoInst) s.addImage({data:G.id.logoInst,x:W/2-1.75,y:H-1.3,w:1.5,h:.75,sizing:{type:'contain',w:1.5,h:.75}});
-    if(G.id.logoProg) s.addImage({data:G.id.logoProg,x:W/2+.25,y:H-1.3,w:1.5,h:.75,sizing:{type:'contain',w:1.5,h:.75}});
+    modelo.gerarEncerramento(pres, G, C);
   }
 
-  setProgress(true,97,'Exportando arquivo...');
-  const fname=(G.id.presTitle||'Wren-Apresentacao').replace(/[^a-zA-Z0-9À-ÿ\s\-_]/g,'').replace(/\s+/g,'-')+'.pptx';
-  await pres.writeFile({fileName:fname});
-  setProgress(false,100,'Pronto!');
-  toast('Apresentação exportada: '+fname,'ok');
+  setProgress(true, 97, 'Exportando arquivo...');
+  const fname = (G.id.presTitle || 'Wren-Apresentacao')
+    .replace(/[^a-zA-Z0-9À-ÿ\s\-_]/g, '')
+    .replace(/\s+/g, '-') + '.pptx';
+  await pres.writeFile({ fileName: fname });
+  setProgress(false, 100, 'Pronto!');
+  toast('Apresentação exportada: ' + fname, 'ok');
 }
 
 // ════════════════════════════════════════════════════
